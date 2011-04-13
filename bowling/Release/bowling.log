@@ -1,0 +1,126 @@
+﻿Build started 2/28/2011 10:15:15 PM.
+     1>Project "C:\MSc Gaming Projects\bowling\bowling\bowling.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Release\bowling.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Bowling.cpp
+         Bowling.cpp
+     1>Bowling.cpp(27): warning C4305: '=' : truncation from 'double' to 'float'
+     1>Bowling.cpp(192): warning C4018: '<' : signed/unsigned mismatch
+     1>Bowling.cpp(221): warning C4018: '<' : signed/unsigned mismatch
+     1>Bowling.cpp(407): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(441): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>Bowling.cpp(513): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(531): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>Bowling.cpp(604): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>Bowling.cpp(625): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(668): warning C4305: '=' : truncation from 'double' to 'float'
+     1>Bowling.cpp(671): warning C4305: '=' : truncation from 'double' to 'float'
+     1>Bowling.cpp(750): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(750): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(752): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(752): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(754): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(754): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(756): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(756): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(771): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(773): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(789): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(789): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(791): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(791): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(793): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(793): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(795): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(795): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(804): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(806): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(810): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(812): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(812): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(819): warning C4244: '-=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(821): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(825): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(827): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(827): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(845): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(845): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(847): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(847): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(849): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(849): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(851): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(851): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(866): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(868): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(884): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(884): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(886): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(886): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(888): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(888): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(890): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(890): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(905): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(907): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(921): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(923): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(925): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(927): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(934): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(936): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(938): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(940): warning C4244: 'argument' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(957): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>Bowling.cpp(971): warning C4305: 'initializing' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(971): warning C4305: 'initializing' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(971): warning C4305: 'initializing' : truncation from 'double' to 'GLfloat'
+     1>Bowling.cpp(1011): warning C4244: 'argument' : conversion from 'cyclone::real' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(1011): warning C4244: 'argument' : conversion from 'cyclone::real' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(1011): warning C4244: 'argument' : conversion from 'cyclone::real' to 'GLfloat', possible loss of data
+     1>Bowling.cpp(1076): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>Bowling.cpp(1111): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Bowling.cpp(1121): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\MSc Gaming Projects\bowling\Release\bowling.exe" /NOLOGO /LIBPATH:"../lib-glfw/release" /LIBPATH:"../lib-ftgl/release" /LIBPATH:"../lib-freetype" opengl32.lib glu32.lib glfw.lib winmm.lib ftgl.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\bowling.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\MSc Gaming Projects\bowling\Release\bowling.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\MSc Gaming Projects\bowling\Release\bowling.lib" /MACHINE:X86 Release\body.obj
+         Release\collide_coarse.obj
+         Release\collide_fine.obj
+         Release\contacts.obj
+         Release\core.obj
+         Release\fgen.obj
+         Release\joints.obj
+         Release\particle.obj
+         Release\pcontacts.obj
+         Release\pfgen.obj
+         Release\plinks.obj
+         Release\pworld.obj
+         Release\random.obj
+         Release\world.obj
+         Release\app.obj
+         Release\BackWall.obj
+         Release\Bowling.obj
+         Release\Face.obj
+         Release\Ground.obj
+         Release\Gutter.obj
+         Release\main.obj
+         Release\ModelLoader.obj
+         Release\MtlHandler.obj
+         Release\Pins.obj
+         Release\TextureLoader.obj
+         Release\TextureVertex.obj
+         Release\timing.obj
+         Release\Vertex.obj
+         Generating code
+         Finished generating code
+         bowling.vcxproj -> C:\MSc Gaming Projects\bowling\Release\bowling.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\MSc Gaming Projects\bowling\Release\bowling.exe;#1" /manifest Release\bowling.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Release\bowling.unsuccessfulbuild".
+         Touching "Release\bowling.lastbuildstate".
+     1>Done Building Project "C:\MSc Gaming Projects\bowling\bowling\bowling.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.50
