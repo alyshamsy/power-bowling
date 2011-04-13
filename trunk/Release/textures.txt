@@ -1,0 +1,13 @@
+# Displays all the images to be used by the game
+11
+back.tga
+bowling-pin.tga
+concrete.tga
+green.tga
+ice.tga
+left-arrow.tga
+left-spin-arrow.tga
+red.tga
+right-arrow.tga
+right-spin-arrow.tga
+wood-floor.tga

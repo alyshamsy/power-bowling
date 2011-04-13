@@ -1,0 +1,17 @@
+﻿Build started 4/13/2011 12:12:25 PM.
+     1>Project "C:\MSc Gaming Projects\power_bowling\bowling\bowling.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\bowling.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+       Link:
+         All outputs are up-to-date.
+         bowling.vcxproj -> C:\MSc Gaming Projects\power_bowling\Debug\bowling.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\bowling.unsuccessfulbuild".
+         Touching "Debug\bowling.lastbuildstate".
+     1>Done Building Project "C:\MSc Gaming Projects\power_bowling\bowling\bowling.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.64

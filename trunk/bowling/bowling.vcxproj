@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="app.cpp" />
+    <ClCompile Include="BackWall.cpp" />
+    <ClCompile Include="Bowling.cpp" />
+    <ClCompile Include="Face.cpp" />
+    <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="Gutter.cpp" />
+    <ClCompile Include="include\cyclone\body.cpp" />
+    <ClCompile Include="include\cyclone\collide_coarse.cpp" />
+    <ClCompile Include="include\cyclone\collide_fine.cpp" />
+    <ClCompile Include="include\cyclone\contacts.cpp" />
+    <ClCompile Include="include\cyclone\core.cpp" />
+    <ClCompile Include="include\cyclone\fgen.cpp" />
+    <ClCompile Include="include\cyclone\joints.cpp" />
+    <ClCompile Include="include\cyclone\particle.cpp" />
+    <ClCompile Include="include\cyclone\pcontacts.cpp" />
+    <ClCompile Include="include\cyclone\pfgen.cpp" />
+    <ClCompile Include="include\cyclone\plinks.cpp" />
+    <ClCompile Include="include\cyclone\pworld.cpp" />
+    <ClCompile Include="include\cyclone\random.cpp" />
+    <ClCompile Include="include\cyclone\world.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="MtlHandler.cpp" />
+    <ClCompile Include="Pins.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
+    <ClCompile Include="TextureVertex.cpp" />
+    <ClCompile Include="timing.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="app.h" />
+    <ClInclude Include="BackWall.h" />
+    <ClInclude Include="Bowling.h" />
+    <ClInclude Include="Face.h" />
+    <ClInclude Include="Ground.h" />
+    <ClInclude Include="Gutter.h" />
+    <ClInclude Include="include\cyclone\body.h" />
+    <ClInclude Include="include\cyclone\collide_coarse.h" />
+    <ClInclude Include="include\cyclone\collide_fine.h" />
+    <ClInclude Include="include\cyclone\contacts.h" />
+    <ClInclude Include="include\cyclone\core.h" />
+    <ClInclude Include="include\cyclone\cyclone.h" />
+    <ClInclude Include="include\cyclone\fgen.h" />
+    <ClInclude Include="include\cyclone\joints.h" />
+    <ClInclude Include="include\cyclone\particle.h" />
+    <ClInclude Include="include\cyclone\pcontacts.h" />
+    <ClInclude Include="include\cyclone\pfgen.h" />
+    <ClInclude Include="include\cyclone\plinks.h" />
+    <ClInclude Include="include\cyclone\precision.h" />
+    <ClInclude Include="include\cyclone\pworld.h" />
+    <ClInclude Include="include\cyclone\random.h" />
+    <ClInclude Include="include\cyclone\world.h" />
+    <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="MtlHandler.h" />
+    <ClInclude Include="Pins.h" />
+    <ClInclude Include="TextureLoader.h" />
+    <ClInclude Include="TextureVertex.h" />
+    <ClInclude Include="timing.h" />
+    <ClInclude Include="Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\textures.txt" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B451013-FF52-466D-83AC-7CC6E56D1581}</ProjectGuid>
+    <RootNamespace>bowling</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib-glfw/debug;lib-ftgl/debug;lib-freetype;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../lib-glfw/release;../lib-ftgl/release;../lib-freetype;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
