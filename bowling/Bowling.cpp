@@ -9,7 +9,7 @@ using namespace std;
 cyclone::Random global_random;
 
 // Method definitions
-Bowling::Bowling():RigidBodyApplication(), font("fonts/trebuc.ttf")
+Bowling::Bowling():RigidBodyApplication(), font("bin/fonts/trebuc.ttf")
 {
 	window_width = 1280, window_height = 800;
 
@@ -90,7 +90,7 @@ void Bowling::initialize() {
 	load_models();
 
 	//load all textures
-	string texture_file_name = "images/textures.txt";
+	string texture_file_name = "bin/images/textures.txt";
 	load_textures(texture_file_name);
 
 	//create all call lists
@@ -98,16 +98,23 @@ void Bowling::initialize() {
 
 	string gutter = "concrete.tga";
 	string wall = "back.tga";
+	string new_wall = "new_back.tga";
 	string grass = "green.tga";
 	string ice = "ice.tga";
 	string wood = "wood-floor.tga";
 
 	gutter_texture = getTextureValue(gutter);
 	wall_texture = getTextureValue(wall);
+	new_wall_texture = getTextureValue(new_wall);
 	grass_texture = getTextureValue(grass);
 	ice_texture = getTextureValue(ice);
 	wood_texture = getTextureValue(wood);
 	current_floor_texture = wood_texture;
+
+	right_alley_list = 0;
+	left_alley_list = 0;
+
+	//open the high scores file and load values into an array
 }
 
 //handle to read models.txt and load models in parallel
@@ -154,6 +161,8 @@ void Bowling::create_call_lists() {
 	//create the model display lists
 	ball_list = glGenLists(1);
 	pin_list = glGenLists(1);
+
+	//create the texture display lists
 	left_direction_list = glGenLists(1);
 	right_direction_list = glGenLists(1);
 	left_spin_list = glGenLists(1);
@@ -173,6 +182,7 @@ void Bowling::create_call_lists() {
 	GLuint left_spin_texture = getTextureValue(left_spin);
 	GLuint right_spin_texture = getTextureValue(right_spin);
 
+	//generate the textures display lists
 	generate_direction_display_list(left_direction_texture, left_direction_list);
 	generate_direction_display_list(right_direction_texture, right_direction_list);
 	generate_spin_display_list(left_spin_texture, left_spin_list);
@@ -531,7 +541,7 @@ void Bowling::reset_shot() {
 	right_gutter->setState(right_gutter_position, gutter_orientation, gutter_extent, gutter_velocity);
 	
 	// Set the pins block
-	int mid = MAX_PINS*0.5;
+	//int mid = MAX_PINS*0.5;
 	for(int i = 0; i < MAX_PINS; i++) {
 		if(pins[i].exists == true) {
 			pins[i].halfSize = cyclone::Vector3(1,1,1);
@@ -781,13 +791,9 @@ void Bowling::draw_power_bar()
 	
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_QUADS);	
-		//glTexCoord2f(0.0, 1.0); 
-		glVertex3f((0.0 - 0.02), (1.0 + 0.02), 0.0);
-		//glTexCoord2f(0.0, 0.0); 
+		glVertex3f((0.0 - 0.02), (1.0 + 0.02), 0.0); 
 		glVertex3f((0.0 - 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 0.0); 
 		glVertex3f((40.0 + 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 1.0); 
 		glVertex3f((40.0 + 0.02), (1.0 + 0.02), 0.0);
 	glEnd();
 
@@ -795,19 +801,16 @@ void Bowling::draw_power_bar()
 
 	if(power < 0.0) {
 		glColor3f(0.0, 1.0, 0.0);
-		//glBindTexture(GL_TEXTURE_2D, texture_images[red_color_index]);
+		glDisable(GL_LIGHTING);
 		glBegin(GL_QUADS);
 			for(float i = 0.0; i < -power; i +=(0.5)) {
-				//glTexCoord2f(0.0, 1.0); 
 				glVertex3f(i, 1.0, 0.0);
-				//glTexCoord2f(0.0, 0.0);
 				glVertex3f(i, 0.0, 0.0);
-				//glTexCoord2f(1.0, 0.0); 
 				glVertex3f(i+(0.5), 0.0, 0.0);
-				//glTexCoord2f(1.0, 1.0); 
 				glVertex3f(i+(0.5), 1.0, 0.0);
 			}
 		glEnd();
+		glEnable(GL_LIGHTING);
 	}
 }
 
@@ -831,117 +834,92 @@ void Bowling::draw_direction_bar(int scale)
 	glEnd();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
-
+	glDisable(GL_LIGHTING);
 	if(movement >= 0.0) {
-		glColor3f(0.0, 1.0, 0.0);
-		//glBindTexture(GL_TEXTURE_2D, texture_images[red_color_index]);
+		glColor3f(0.0, 0.0, 1.0);
 		glBegin(GL_QUADS);
 			for(float i = 0.0; i < movement*scale; i +=(0.5*scale)) {
-				//glTexCoord2f(0.0, 1.0); 
 				glVertex3f(i, 0.5*scale, 0.0);
-				//glTexCoord2f(0.0, 0.0);
 				glVertex3f(i, 0.0, 0.0);
-				//glTexCoord2f(1.0, 0.0); 
 				glVertex3f(i+(0.5*scale), 0.0, 0.0);
-				//glTexCoord2f(1.0, 1.0); 
 				glVertex3f(i+(0.5*scale), 0.5*scale, 0.0);
 			}
 		glEnd();
 	} else {
-		glColor3f(1.0, 1.0, 0.0);
-		//glBindTexture(GL_TEXTURE_2D, texture_images[green_color_index]);
+		glColor3f(0.0, 0.0, 1.0);
 		glBegin(GL_QUADS);
 			for(float i = 0.0; i > movement*scale; i -=(0.5*scale)) {
-				//glTexCoord2f(0.0, 1.0); 
 				glVertex3f(i, 0.5*scale, 0.0);
-				//glTexCoord2f(0.0, 0.0);
 				glVertex3f(i, 0.0, 0.0);
-				//glTexCoord2f(1.0, 0.0); 
 				glVertex3f(i+(0.5*scale), 0.0, 0.0);
-				//glTexCoord2f(1.0, 1.0); 
 				glVertex3f(i+(0.5*scale), 0.5*scale, 0.0);
 			}
 		glEnd();
 	}
-
-	
+	glEnable(GL_LIGHTING);
 }
 
 void Bowling::draw_left_spin_bar() 
 {
-	FTPoint left_spin_text_position((window_width*0.17), window_height*0.53);
+	FTPoint left_spin_text_position((window_width*0.17), window_height*0.585);
 	display_text("Left Spin", left_spin_text_position, 24);
 
 	glPolygonMode(GL_FRONT, GL_LINE);
 	
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_QUADS);	
-		//glTexCoord2f(0.0, 1.0); 
-		glVertex3f((-19.5 - 0.02), (0.5 + 0.02), 0.0);
-		//glTexCoord2f(0.0, 0.0); 
-		glVertex3f((-19.5 - 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 0.0); 
-		glVertex3f((0.5 + 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 1.0); 
-		glVertex3f((0.5 + 0.02), (0.5 + 0.02), 0.0);
+		glVertex3f((-19.5 - 0.02), (4.25 + 0.02), 0.0);
+		glVertex3f((-19.5 - 0.02), (3.75 + 0.02), 0.0);
+		glVertex3f((0.5 + 0.02), (3.75 + 0.02), 0.0);
+		glVertex3f((0.5 + 0.02), (4.25 + 0.02), 0.0);
 	glEnd();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	if(spin > 0.0) {
-		glColor3f(0.0, 1.0, 1.0);
-		//glBindTexture(GL_TEXTURE_2D, texture_images[red_color_index]);
+		glColor3f(1.0, 0.0, 0.0);
+		glDisable(GL_LIGHTING);
 		glBegin(GL_QUADS);
 			for(float i = 0.0; i > -spin; i -=(0.5)) {
-				//glTexCoord2f(0.0, 1.0); 
-				glVertex3f(i, 0.5, 0.0);
-				//glTexCoord2f(0.0, 0.0);
-				glVertex3f(i, 0.0, 0.0);
-				//glTexCoord2f(1.0, 0.0); 
-				glVertex3f(i+(0.5), 0.0, 0.0);
-				//glTexCoord2f(1.0, 1.0); 
-				glVertex3f(i+(0.5), 0.5, 0.0);
+				glVertex3f(i, 4.25, 0.0);
+				glVertex3f(i, 3.75, 0.0);
+				glVertex3f(i+(0.5), 3.75, 0.0);
+				glVertex3f(i+(0.5), 4.25, 0.0);
 			}
 		glEnd();
+		glEnable(GL_LIGHTING);
 	}
 }
 
 void Bowling::draw_right_spin_bar() 
 {
-	FTPoint right_spin_text_position((window_width*0.73), window_height*0.53);
+	FTPoint right_spin_text_position((window_width*0.75), window_height*0.585);
 	display_text("Right Spin", right_spin_text_position, 24);
 
 	glPolygonMode(GL_FRONT, GL_LINE);
 	
 	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_QUADS);	
-		//glTexCoord2f(0.0, 1.0); 
-		glVertex3f((0.0 - 0.02), (0.5 + 0.02), 0.0);
-		//glTexCoord2f(0.0, 0.0); 
-		glVertex3f((0.0 - 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 0.0); 
-		glVertex3f((20.0 + 0.02), (0.0 + 0.02), 0.0);
-		//glTexCoord2f(1.0, 1.0); 
-		glVertex3f((20.0 + 0.02), (0.5 + 0.02), 0.0);
+		glVertex3f((0.0 - 0.02), (4.25 + 0.02), 0.0);
+		glVertex3f((0.0 - 0.02), (3.75 + 0.02), 0.0);
+		glVertex3f((20.0 + 0.02), (3.75 + 0.02), 0.0);
+		glVertex3f((20.0 + 0.02), (4.25 + 0.02), 0.0);
 	glEnd();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
 
 	if(spin < 0.0) {
-		glColor3f(0.0, 1.0, 1.0);
-		//glBindTexture(GL_TEXTURE_2D, texture_images[red_color_index]);
+		glColor3f(1.0, 0.0, 0.0);
+		glDisable(GL_LIGHTING);
 		glBegin(GL_QUADS);
 			for(float i = 0.0; i < -spin; i +=(0.5)) {
-				//glTexCoord2f(0.0, 1.0); 
-				glVertex3f(i, 0.5, 0.0);
-				//glTexCoord2f(0.0, 0.0);
-				glVertex3f(i, 0.0, 0.0);
-				//glTexCoord2f(1.0, 0.0); 
-				glVertex3f(i+(0.5), 0.0, 0.0);
-				//glTexCoord2f(1.0, 1.0); 
-				glVertex3f(i+(0.5), 0.5, 0.0);
+				glVertex3f(i, 4.25, 0.0);
+				glVertex3f(i, 3.75, 0.0);
+				glVertex3f(i+(0.5), 3.75, 0.0);
+				glVertex3f(i+(0.5), 4.25, 0.0);
 			}
 		glEnd();
+		glEnable(GL_LIGHTING);
 	}
 }
 
@@ -949,29 +927,20 @@ void Bowling::draw_score() {
 	glPolygonMode(GL_FRONT, GL_LINE);
 
 	glColor3f(0.0, 0.0, 0.0);
-	//glBindTexture(GL_TEXTURE_2D, texture_images[red_color_index]);
 	glBegin(GL_QUADS);
 		for(int i = 0; i < 20; i++) {
-			//glTexCoord2f(0.0, 1.0); 
 			glVertex3f(i, 1.0, 0.0);
-			//glTexCoord2f(0.0, 0.0);
 			glVertex3f(i, 0.0, 0.0);
-			//glTexCoord2f(1.0, 0.0); 
 			glVertex3f(i+1, 0.0, 0.0);
-			//glTexCoord2f(1.0, 1.0); 
 			glVertex3f(i+1, 1.0, 0.0);
 		}
 	glEnd();
 
 	glBegin(GL_QUADS);
 		for(int i = 0; i < 20; i+=2) {
-			//glTexCoord2f(0.0, 1.0); 
 			glVertex3f(i, 0.0, 0.0);
-			//glTexCoord2f(0.0, 0.0);
 			glVertex3f(i, -1.0, 0.0);
-			//glTexCoord2f(1.0, 0.0); 
 			glVertex3f(i+2, -1.0, 0.0);
-			//glTexCoord2f(1.0, 1.0); 
 			glVertex3f(i+2, 0.0, 0.0);
 		}
 	glEnd();
@@ -1000,10 +969,79 @@ void Bowling::draw_score() {
 	}
 }
 
+void Bowling::draw_left_side_alleys() {
+	if(left_alley_list == 0) {
+		left_alley_list = glGenLists(1);
+		glNewList(left_alley_list, GL_COMPILE);
+			//draw the pins
+			glPushMatrix();
+				glTranslatef(0.0f, -1.0f, 0.0f);
+				for (Pins *pin = pins; pin < pins+MAX_PINS; pin++)
+				{
+					pin->render(pin_list);
+				}
+			glPopMatrix();
+
+			//draw the back wall
+			glPushMatrix();
+				wall->render(new_wall_texture);
+			glPopMatrix();
+	
+			//draw the gutters
+			glPushMatrix();
+				left_gutter->render(gutter_texture);
+				glTranslatef(10.0, 0.0, 0.0);
+				left_gutter->render(gutter_texture);
+			glPopMatrix();
+
+			//draw the ground
+			glPushMatrix();
+				ground->render(current_floor_texture);
+			glPopMatrix();
+		glEndList();
+	} else {
+		glCallList(left_alley_list);
+	}
+}
+
+void Bowling::draw_right_side_alleys() {
+	if(right_alley_list == 0) {
+		right_alley_list = glGenLists(1);
+		glNewList(right_alley_list, GL_COMPILE);
+			//draw the pins
+			glPushMatrix();
+				glTranslatef(0.0f, -1.0f, 0.0f);
+				for (Pins *pin = pins; pin < pins+MAX_PINS; pin++)
+				{
+					pin->render(pin_list);
+				}
+			glPopMatrix();
+
+			//draw the back wall
+			glPushMatrix();
+				wall->render(new_wall_texture);
+			glPopMatrix();
+	
+			//draw the gutters
+			glPushMatrix();
+				right_gutter->render(gutter_texture);
+				glTranslatef(-10.0, 0.0, 0.0);
+				right_gutter->render(gutter_texture);
+			glPopMatrix();
+
+			//draw the ground
+			glPushMatrix();
+				ground->render(current_floor_texture);
+			glPopMatrix();
+		glEndList();
+	} else {
+		glCallList(right_alley_list);
+	}
+}
+
 void Bowling::display_end_of_game_screen() {
 	//draw the pins
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		glTranslatef(0.0f, -1.0f, 0.0f);
 		for (Pins *pin = pins; pin < pins+MAX_PINS; pin++)
 		{
@@ -1012,29 +1050,44 @@ void Bowling::display_end_of_game_screen() {
 				pin->render(pin_list);
 			}
 		}
-		//glDisable(GL_NORMALIZE);
+	glPopMatrix();
+
+	//draw the bowling alleys on the right side
+	glPushMatrix();
+		glTranslatef(12.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(24.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	//draw the bowling alleys on the left side
+	glPushMatrix();
+		glTranslatef(-12.0, 0.0, 0.0);
+		draw_left_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-24.0, 0.0, 0.0);
+		draw_left_side_alleys();
 	glPopMatrix();
 
 	//draw the back wall
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		wall->render(wall_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 	
 	//draw the gutters
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		left_gutter->render(gutter_texture);
 		right_gutter->render(gutter_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 
 	//draw the ground
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		ground->render(current_floor_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 
 	//draw the score boxes
@@ -1048,7 +1101,6 @@ void Bowling::display_end_of_game_screen() {
 void Bowling::display_normal_screen() {
 	//draw the pins
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		glTranslatef(0.0f, -1.0f, 0.0f);
 		for (Pins *pin = pins; pin < pins+MAX_PINS; pin++)
 		{
@@ -1057,7 +1109,6 @@ void Bowling::display_normal_screen() {
 				pin->render(pin_list);
 			}
 		}
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 
 	//draw the ball
@@ -1071,26 +1122,42 @@ void Bowling::display_normal_screen() {
 		glPopMatrix();
 	}
 
+	//draw the bowling alleys on the right side
+	glPushMatrix();
+		glTranslatef(12.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(24.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	//draw the bowling alleys on the left side
+	glPushMatrix();
+		glTranslatef(-12.0, 0.0, 0.0);
+		draw_left_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-24.0, 0.0, 0.0);
+		draw_left_side_alleys();
+	glPopMatrix();
+
 	//draw the back wall
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		wall->render(wall_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 	
 	//draw the gutters
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		left_gutter->render(gutter_texture);
 		right_gutter->render(gutter_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 
 	//draw the ground
 	glPushMatrix();
-		//glEnable(GL_NORMALIZE);
 		ground->render(current_floor_texture);
-		//glDisable(GL_NORMALIZE);
 	glPopMatrix();
 
 	//draw the left direction image
@@ -1107,57 +1174,49 @@ void Bowling::display_normal_screen() {
 
 	//draw the left spin image
 	glPushMatrix();
-		glTranslatef(-9.5, 5.0, 15.0);
+		glTranslatef(-9.5, 6.0, 15.0);
 		glCallList(left_spin_list);
 	glPopMatrix();
 
 	//draw the right spin image
 	glPushMatrix();
-		glTranslatef(9.0, 5.0, 15.0);
+		glTranslatef(9.0, 6.0, 15.0);
 		glCallList(right_spin_list);
 	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
-	//draw the power bar
-	glPushMatrix();
-		glEnable(GL_COLOR_MATERIAL);
-		glTranslatef(-5.0, 7.5, 18.0);
-		glScalef(0.25, 0.25, 0.25);
-		draw_power_bar();
-		glDisable(GL_COLOR_MATERIAL);
-	glPopMatrix();
-
-	//draw the sideways movement bar
-	glPushMatrix();
-		glEnable(GL_COLOR_MATERIAL);
-		glTranslatef(0.0, 6.5, 18.0);
-		glScalef(0.25, 0.25, 0.25);
-		draw_direction_bar(1.0);
-		glDisable(GL_COLOR_MATERIAL);
-	glPopMatrix();
-
-	//draw the right spin bar
-	glPushMatrix();
-		glEnable(GL_COLOR_MATERIAL);
-		glTranslatef(3.5, 5.0, 15.0);
-		glScalef(0.25, 0.25, 0.25);
-		draw_right_spin_bar();
-		glDisable(GL_COLOR_MATERIAL);
-	glPopMatrix();
-
-	//draw the left spin bar
-	glPushMatrix();
-		glEnable(GL_COLOR_MATERIAL);
-		glTranslatef(-3.5, 5.0, 15.0);
-		glScalef(0.25, 0.25, 0.25);
-		draw_left_spin_bar();
-		glDisable(GL_COLOR_MATERIAL);
-	glPopMatrix();
-
 	//draw the score boxes
 	glPushMatrix();
 		glTranslatef(-10.0, 11.5, 15.0);
 		draw_score();
+	glPopMatrix();
+
+	//draw the power bar
+	glPushMatrix();
+		glTranslatef(-5.0, 7.5, 18.0);
+		glScalef(0.25, 0.25, 0.25);
+		draw_power_bar();
+	glPopMatrix();
+
+	//draw the sideways movement bar
+	glPushMatrix();
+		glTranslatef(0.0, 6.5, 18.0);
+		glScalef(0.25, 0.25, 0.25);
+		draw_direction_bar(1.0);
+	glPopMatrix();
+
+	//draw the right spin bar
+	glPushMatrix();
+		glTranslatef(3.5, 5.0, 15.0);
+		glScalef(0.25, 0.25, 0.25);
+		draw_right_spin_bar();
+	glPopMatrix();
+
+	//draw the left spin bar
+	glPushMatrix();
+		glTranslatef(-3.5, 5.0, 15.0);
+		glScalef(0.25, 0.25, 0.25);
+		draw_left_spin_bar();
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
 }
@@ -1185,6 +1244,28 @@ void Bowling::display_shot_screen() {
 			glCallList(ball_list);
 		glPopMatrix();
 	}
+
+	//draw the bowling alleys on the right side
+	glPushMatrix();
+		glTranslatef(12.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(24.0, 0.0, 0.0);
+		draw_right_side_alleys();
+	glPopMatrix();
+
+	//draw the bowling alleys on the left side
+	glPushMatrix();
+		glTranslatef(-12.0, 0.0, 0.0);
+		draw_left_side_alleys();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-24.0, 0.0, 0.0);
+		draw_left_side_alleys();
+	glPopMatrix();
 
 	//draw the back wall
 	glPushMatrix();

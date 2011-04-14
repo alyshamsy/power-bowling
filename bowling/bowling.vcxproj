@@ -72,7 +72,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\textures.txt" />
+    <None Include="bin\images\textures.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8B451013-FF52-466D-83AC-7CC6E56D1581}</ProjectGuid>

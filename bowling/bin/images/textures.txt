@@ -1,5 +1,5 @@
 # Displays all the images to be used by the game
-18
+19
 back.tga
 bowling-pin.tga
 concrete.tga
@@ -16,5 +16,6 @@ button.tga
 menu.tga
 new_game_button.tga
 game_controls_button.tga
-leaderboard_button.tga
+high_scores_button.tga
 quit_button.tga
+new_back.tga
