@@ -8,10 +8,15 @@ using namespace std;
 #define DEG2RAD 0.0174532778f
 cyclone::Random global_random;
 
+string keysPressed;
+void  GLFWCALL getInputs( int key, int action );
+void  GLFWCALL emptyCallBack( int key, int action );
+
 // Method definitions
-Bowling::Bowling():RigidBodyApplication(), font("bin/fonts/trebuc.ttf")
+Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 {
 	window_width = 1280, window_height = 800;
+	aspect_ratio = (float)window_width/window_height;
 
 	bowled = false;
 	shot_reset = false;
@@ -41,6 +46,11 @@ Bowling::Bowling():RigidBodyApplication(), font("bin/fonts/trebuc.ttf")
 
 	for(int i = 0; i < 10; i++) {
 		frame_score[i] = -1;
+	}
+
+	for(int i = 0; i < MAX_HIGH_SCORES; i++) {
+		names[i] = "";
+		scores[i] = 0;
 	}
 
 	// Create the ball.
@@ -93,6 +103,9 @@ void Bowling::initialize() {
 	string texture_file_name = "bin/images/textures.txt";
 	load_textures(texture_file_name);
 
+	//load the high scores file and store in an array
+	load_high_scores();
+
 	//create all call lists
 	create_call_lists();
 
@@ -113,8 +126,6 @@ void Bowling::initialize() {
 
 	right_alley_list = 0;
 	left_alley_list = 0;
-
-	//open the high scores file and load values into an array
 }
 
 //handle to read models.txt and load models in parallel
@@ -152,6 +163,101 @@ int Bowling::load_textures(string& texture_file) {
 	}
 
 	textures.LoadTextures(texture_file_names, number_of_textures, texture_images);
+
+	return 0;
+}
+
+int Bowling::load_high_scores() {
+	//open the high scores file and load values into an array
+	string name, high_scores_file_name = "bin/high_scores.txt";
+	int score, i = 0;
+	fstream read_high_scores;
+
+	read_high_scores.open(high_scores_file_name, ios::in);
+	
+	if(!read_high_scores) {
+		return 1;
+	}
+
+	while(!read_high_scores.eof()/* && i <= 9*/) {
+		read_high_scores >> name >> score;
+
+		names[i] = name;
+		scores[i] = score;
+
+		i++;
+	}
+
+	read_high_scores.close();
+
+	return 0;
+}
+
+int Bowling::save_high_scores() {
+	//open the high scores file and load values into an array
+	string name, high_scores_file_name = "bin/high_scores.txt";
+	int score, number_of_high_scores = 0;
+	ofstream save_high_scores;
+
+	save_high_scores.open(high_scores_file_name, ios::out);
+	
+	if(!save_high_scores) {
+		return 1;
+	}
+
+	for(int i = 0; i < MAX_HIGH_SCORES; i++) {
+		if(scores[i] == 0) {
+			number_of_high_scores = i;
+			break;
+		}
+	}
+
+	for(int i = 0; i < number_of_high_scores; i++) {
+		name = names[i];
+		score = scores[i];
+
+		if(i < number_of_high_scores - 1) {
+			save_high_scores << name << ' ' << score << endl;
+		} else {
+			save_high_scores << name << ' ' << score;
+		}
+	}
+
+	save_high_scores.close();
+
+	return 0;
+}
+
+int Bowling::update_high_scores(string name, int score) {
+	string current_names[MAX_HIGH_SCORES];
+	int current_top_scores[MAX_HIGH_SCORES];
+
+	int current_rank = 0;
+
+	for(int i = 0; i < MAX_HIGH_SCORES; i++) {
+		current_names[i] = names[i];
+		current_top_scores[i] = scores[i];
+	}
+
+	for(int i = 0; i < MAX_HIGH_SCORES; i++) {
+		if(score >= current_top_scores[i]) {
+			current_rank = i;
+			break;
+		}
+	}
+
+	for(int i = 0; i < current_rank; i++) {
+		names[i] = current_names[i];
+		scores[i] = current_top_scores[i];
+	}
+
+	names[current_rank] = name;
+	scores[current_rank] = score;
+
+	for(int i = current_rank; i < MAX_HIGH_SCORES - 1; i++) {
+		names[i + 1] = current_names[i];
+		scores[i + 1] = current_top_scores[i];
+	}
 
 	return 0;
 }
@@ -659,7 +765,7 @@ void Bowling::bowl() {
 	hit = false;
 }
 
-void Bowling::update()
+int Bowling::update()
 {
 	RigidBodyApplication::update();
 	
@@ -673,26 +779,75 @@ void Bowling::update()
 			reset_frame();
 		}
 
-		if(bowling_shot == 20) {
-			//add fireworks particles and high score check
-			double end_game_time = glfwGetTime();
-			string game_score = intToString(frame_score[9]);
+		if(bowling_shot == 2) {
+			int final_score = /*frame_score[9];*/ frame_score[0];
+
+			FTPoint high_score_name_text_position((window_width*0.455), window_height*0.445);
 
 			FTPoint end_game_text_position((window_width*0.15), window_height*0.75);
 			FTPoint info_text_position((window_width*0.30), window_height*0.45);
-			FTPoint score_text_position((window_width*0.47), window_height*0.30);
+			FTPoint score_text_position((window_width*0.48), window_height*0.30);
 
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
 
+			double end_game_time = glfwGetTime();
+			
 			end_of_game = true;
 			while(glfwGetTime() - end_game_time <= 3.0) {	
 				display();
 				glfwSwapBuffers();
 			}
+			
+			//check the score and if it is a high score then ask for name and call update_high_scores
+			if(final_score > scores[MAX_HIGH_SCORES - 1]) {
+				bool name_entered = false;
+				int high_score_name_box;
+				string high_score_name_box_image = "high-score-box.tga";
+				string high_score_name = "";
 
+				high_score_name_box = getTextureValue(high_score_name_box_image);
+
+				glfwSetKeyCallback(getInputs);
+
+				while(!name_entered) {
+					glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+					glMatrixMode(GL_PROJECTION);
+					glLoadIdentity();
+					gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
+
+					glMatrixMode(GL_MODELVIEW);
+					glLoadIdentity();
+					glTranslatef(0.0, 0.0, -5.0);
+
+					glBindTexture(GL_TEXTURE_2D, high_score_name_box);
+					glBegin(GL_QUADS);
+						glColor3f(1.0, 1.0, 1.0);
+						glTexCoord2f(0.0, 0.0); glVertex3f(-2.5, -1.5, 0.0);			
+						glTexCoord2f(0.0, 1.0); glVertex3f(-2.5, 1.5, 0.0);			
+						glTexCoord2f(1.0, 1.0); glVertex3f(2.5, 1.5, 0.0);
+						glTexCoord2f(1.0, 0.0); glVertex3f(2.5, -1.5, 0.0);
+					glEnd();
+
+					high_score_name = keysPressed;
+					display_text(high_score_name, high_score_name_text_position, 24);
+
+					glfwSwapBuffers();
+
+					if(glfwGetKey( GLFW_KEY_ENTER )) {
+						name_entered = true;
+					}
+				}
+				glfwSetKeyCallback(emptyCallBack);
+				update_high_scores(high_score_name, final_score);
+			}
+
+			//add fireworks particles and high score check
 			end_game_time = glfwGetTime();
-			while(glfwGetTime() - end_game_time <= 10.0) {
+			string game_score = intToString(final_score);
+
+			while(glfwGetTime() - end_game_time <= 5.0) {
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 				display_text("Congratulations!!!", end_game_text_position, 100);
@@ -704,7 +859,11 @@ void Bowling::update()
 
 			glEnable(GL_LIGHTING);
 			glEnable(GL_TEXTURE_2D);
+
+			save_high_scores();
 			reset();
+
+			return 0;
 		}
 	}
 
@@ -718,6 +877,8 @@ void Bowling::update()
 		current_floor_texture = ice_texture;
 		ball.body->setDamping(0.995f, 0.995f);
 	} 
+
+	return 1;
 }
 
 void Bowling::updateObjects(cyclone::real duration)
@@ -743,8 +904,8 @@ void Bowling::updateObjects(cyclone::real duration)
 }
 
 void Bowling::display_text(string text, FTPoint& position, unsigned int size) {
-	font.FaceSize(size);
-	font.Render(text.c_str(), -1, position);
+	game_font.FaceSize(size);
+	game_font.Render(text.c_str(), -1, position);
 }
 
 string Bowling::intToString(int a) {
@@ -1406,4 +1567,63 @@ void Bowling::key()
 Application* getApplication()
 {
     return new Bowling();
+}
+
+void  GLFWCALL emptyCallBack( int key, int action ){
+
+}
+
+void  GLFWCALL getInputs( int key, int action ){
+	static int letterCount = 0;
+
+	if( action != GLFW_PRESS ) {
+        return;
+    }
+
+	if(letterCount < 8) {
+		//	glfwSetKeyCallback( keyInputs.getInputs );
+		switch( key ){
+			case GLFW_KEY_ESC: break;
+			case 'A':keysPressed+='A';letterCount++;break;
+			case 'B':keysPressed+='B';letterCount++;break;
+			case 'C':keysPressed+='C';letterCount++;break;
+			case 'D':keysPressed+='D';letterCount++;break;
+			case 'E':keysPressed+='E';letterCount++;break;
+			case 'F':keysPressed+='F';letterCount++;break;
+			case 'G':keysPressed+='G';letterCount++;break;
+			case 'H':keysPressed+='H';letterCount++;break;
+			case 'I':keysPressed+='I';letterCount++;break;
+			case 'J':keysPressed+='J';letterCount++;break;
+			case 'K':keysPressed+='K';letterCount++;break;
+			case 'L':keysPressed+='L';letterCount++;break;
+			case 'M':keysPressed+='M';letterCount++;break;
+			case 'N':keysPressed+='N';letterCount++;break;
+			case 'O':keysPressed+='O';letterCount++;break;
+			case 'P':keysPressed+='P';letterCount++;break;
+			case 'Q':keysPressed+='Q';letterCount++;break;
+			case 'R':keysPressed+='R';letterCount++;break;
+			case 'S':keysPressed+='S';letterCount++;break;
+			case 'T':keysPressed+='T';letterCount++;break;
+			case 'U':keysPressed+='U';letterCount++;break;
+			case 'V':keysPressed+='V';letterCount++;break;
+			case 'W':keysPressed+='W';letterCount++;break;
+			case 'X':keysPressed+='X';letterCount++;break;
+			case 'Y':keysPressed+='Y';letterCount++;break;
+			case 'Z':keysPressed+='Z';letterCount++;break;
+			case GLFW_KEY_DEL:
+			case GLFW_KEY_BACKSPACE:
+				if(keysPressed.size()>0) {
+					keysPressed.erase(keysPressed.size()-1);
+					letterCount--;
+				}
+			break;
+		}
+	 } else{
+		switch(key) {
+			case GLFW_KEY_BACKSPACE:
+			case GLFW_KEY_DEL:
+				keysPressed.erase(keysPressed.size()-1);
+				letterCount--;
+		}
+	}
 }

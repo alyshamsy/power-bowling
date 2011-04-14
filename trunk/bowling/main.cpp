@@ -166,13 +166,16 @@ void exit() {
  * Called each frame to update the 3D scene. Delegates to
  * the application.
  */
-void update()
+int update()
 {
+	int running = 1;
     // Update the timing.
     TimingData::get().update();
 
     // Delegate to the application.
-    app->update();
+    running = app->update();
+
+	return running;
 }
 
 /**
@@ -314,11 +317,6 @@ int menu() {
 		glEnd();
 		glPopAttrib();
 
-		/*display_text("New Game", new_game_text_position, 50);
-		display_text("Game Controls", controls_text_position, 50);
-		display_text("Leaderboard", leaderboard_text_position, 50);
-		display_text("Quit", quit_game_text_position, 50);*/
-
 		glfwSwapBuffers();
 
 		if(glfwGetKey( GLFW_KEY_UP ) && glfwGetTime() - selection_time >= 0.25) {
@@ -380,15 +378,15 @@ int main()
 		while( running == 1 ) {
 			glDisable(GL_BLEND);
 
+			running = glfwGetWindowParam( GLFW_OPENED );
+
 			//updates the world
-			update();
+			running = update();
 
 			keyboard();
 
 			//sets up the camera for the game
 			display();
-
-			running = glfwGetWindowParam( GLFW_OPENED );
 
 			//Check if ESC key	was pressed or window was closed. if yes add the window to ask if you want to quit
 			pause_time = glfwGetTime();
@@ -423,7 +421,6 @@ int main()
 				glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 				glBegin(GL_QUADS);
 					glColor3f(1.0, 1.0, 1.0);
-					//glColor4f(0.0, 0.0, 0.0, 0.5);
 					if(select_exit_value == 1) {
 						glColor4f(1.0, 1.0, 0.0, 0.5);
 					}
@@ -438,7 +435,6 @@ int main()
 				glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 				glBegin(GL_QUADS);
 					glColor3f(1.0, 1.0, 1.0);
-					//glColor4f(0.0, 0.0, 0.0, 0.5);
 					if(select_exit_value == 0) {
 						glColor4f(1.0, 1.0, 0.0, 0.5);
 					}
@@ -463,8 +459,8 @@ int main()
 
 				if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 1) {
 					pause_game = false;
-					//replace with show menu
 					running = 0;
+					//rest the game before exiting
 				} else if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 0) {
 					pause_game = false;
 
