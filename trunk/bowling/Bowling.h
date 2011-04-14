@@ -45,6 +45,7 @@ class Bowling : public RigidBodyApplication
 
 	int gutter_texture;
 	int wall_texture;
+	int new_wall_texture;
 	int grass_texture;
 	int ice_texture;
 	int wood_texture;
@@ -92,6 +93,8 @@ class Bowling : public RigidBodyApplication
 	GLuint right_direction_list;
 	GLuint left_spin_list;
 	GLuint right_spin_list;
+	GLuint left_alley_list;
+	GLuint right_alley_list;
 
 	//Holds the score
 	int game_score[20];
@@ -128,6 +131,9 @@ class Bowling : public RigidBodyApplication
 	void draw_direction_bar(int scale);
 	void draw_left_spin_bar();
 	void draw_right_spin_bar();
+
+	void draw_right_side_alleys();
+	void draw_left_side_alleys();
 
 	//draw the score
 	void draw_score();

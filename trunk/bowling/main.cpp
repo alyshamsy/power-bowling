@@ -34,7 +34,7 @@ Application* app;
 
 int window_width = 1280, window_height = 800;
 float aspect_ratio;
-FTGLPixmapFont font("fonts/calibrib.ttf");
+FTGLPixmapFont font("bin/fonts/calibrib.ttf");
 
 void init() {
 	GLuint logo_texture;
@@ -78,7 +78,7 @@ void init() {
     glGenTextures(1, &logo_texture);
     GLFWimage current_image;
 
-    GLuint success = glfwReadImage("images/company.tga", &current_image, 0);
+    GLuint success = glfwReadImage("bin/images/company.tga", &current_image, 0);
 
     if(success) {
         glBindTexture(GL_TEXTURE_2D, logo_texture);
@@ -113,7 +113,7 @@ void init() {
         glfwSwapBuffers();
     }
 
-	success = glfwReadImage("images/logo.tga", &current_image, 0);
+	success = glfwReadImage("bin/images/logo.tga", &current_image, 0);
 
     if(success) {
         glBindTexture(GL_TEXTURE_2D, logo_texture);
@@ -207,7 +207,7 @@ void display_text(string text, FTPoint& position, unsigned int size) {
 int menu() {
 	int selection_value = 0;
 	int current_selection = 1;
-	int menu, new_game_button, game_controls_button, leaderboard_button, quit_button;
+	int menu, new_game_button, game_controls_button, high_scores_button, quit_button;
 
 	double selection_time = glfwGetTime();
 	double enter_time = glfwGetTime();
@@ -220,13 +220,13 @@ int menu() {
 	string menu_image = "menu.tga";
 	string new_game_button_image = "new_game_button.tga";
 	string game_controls_button_image = "game_controls_button.tga";
-	string leaderboard_button_image = "leaderboard_button.tga";
+	string high_scores_button_image = "high_scores_button.tga";
 	string quit_button_image = "quit_button.tga";
 
 	menu = app->getTextureValue(menu_image);
 	new_game_button = app->getTextureValue(new_game_button_image);
 	game_controls_button = app->getTextureValue(game_controls_button_image);
-	leaderboard_button = app->getTextureValue(leaderboard_button_image);
+	high_scores_button = app->getTextureValue(high_scores_button_image);
 	quit_button = app->getTextureValue(quit_button_image);
 
 	while(selection_value == 0) {
@@ -284,7 +284,7 @@ int menu() {
 		glEnd();
 		glPopAttrib();
 
-		glBindTexture(GL_TEXTURE_2D, leaderboard_button);
+		glBindTexture(GL_TEXTURE_2D, high_scores_button);
 		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 		glBegin(GL_QUADS);
 			glColor3f(1.0, 1.0, 1.0);
@@ -378,6 +378,8 @@ int main()
 		select_exit_value = 0;
 
 		while( running == 1 ) {
+			glDisable(GL_BLEND);
+
 			//updates the world
 			update();
 

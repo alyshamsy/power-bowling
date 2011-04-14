@@ -14,7 +14,7 @@ GLuint* TextureLoader::LoadTextures(string* textures, int number_of_textures, GL
 	string texture_file_name;
 
 	for(int i = 0; i < number_of_textures; i++) {
-		texture_file_name = "images/";
+		texture_file_name = "bin/images/";
 		texture_file_name.append(textures[i]);
 		success = glfwReadImage(texture_file_name.c_str(), &current_image, 0);
 

@@ -190,7 +190,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\textures.txt">
+    <None Include="bin\images\textures.txt">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

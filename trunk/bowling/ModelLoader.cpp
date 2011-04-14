@@ -61,7 +61,7 @@ Also assumes vertices and faces are spelt with lower cases
 */
 int ModelLoader::ParseFile(string& model_file_name) {
 	stringstream face_values(stringstream::in | stringstream::out);
-	string current_definition, current_face_values, file_name = "models/";
+	string current_definition, current_face_values, file_name = "bin/models/";
 	int bad_input = 0, array_size;
 
 	Vertex model_vertices;
@@ -81,7 +81,7 @@ int ModelLoader::ParseFile(string& model_file_name) {
 
 	if(current_definition.compare("mtllib") == 0) {
 		//handle the mtl file
-		string materials_file_name = "models/", temp_string;
+		string materials_file_name = "bin/models/", temp_string;
 
 		read_model_file >> temp_string;
 		materials_file_name.append(temp_string);
