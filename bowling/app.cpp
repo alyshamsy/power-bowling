@@ -51,8 +51,9 @@ void Application::deinit()
 {
 }
 
-void Application::update()
+int Application::update()
 {
+	return 1;
 }
 
 void Application::key()
@@ -117,19 +118,19 @@ void MassAggregateApplication::display()
 	gluDeleteQuadric(sphere_quad);
 }
 
-void MassAggregateApplication::update()
+int MassAggregateApplication::update()
 {
 	// Clear accumulators
 	world.startFrame();
 
 	// Find the duration of the last frame in seconds
 	float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
-	if (duration <= 0.0f) return;
+	if (duration <= 0.0f) return 0;
 
 	// Run the simulation
 	world.runPhysics(duration);
 
-	Application::update();
+	return Application::update();
 }
 
 RigidBodyApplication::RigidBodyApplication()
@@ -145,18 +146,17 @@ RigidBodyApplication::RigidBodyApplication()
     cData.contactArray = contacts;
 }
 
-void RigidBodyApplication::update()
+int RigidBodyApplication::update()
 {
     // Find the duration of the last frame in seconds
     float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
-    if (duration <= 0.0f) return;
+    if (duration <= 0.0f) return 0;
     else if (duration > 0.05f) duration = 0.05f;
 
     // Exit immediately if we aren't running the simulation
     if (pauseSimulation) 
     {
-        Application::update();
-        return;
+        return Application::update();
     }
     else if (autoPauseSimulation)
     {
@@ -177,7 +177,7 @@ void RigidBodyApplication::update()
         duration
         );
 
-    Application::update();
+    return Application::update();
 }
 
 void RigidBodyApplication::display()

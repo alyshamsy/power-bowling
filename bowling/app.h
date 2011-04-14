@@ -106,7 +106,7 @@ public:
      * It should probably be called from any subclass update as the last
      * command.
      */
-    virtual void update();
+    virtual int update();
 
     /**
      * Called when a keypress is detected.
@@ -137,7 +137,7 @@ public:
 	virtual ~MassAggregateApplication();
 
 	/** Update the particle positions. */
-	virtual void update();
+	virtual int update();
 
 	/** Sets up the graphic rendering. */
 	virtual void initGraphics();
@@ -209,7 +209,7 @@ public:
 	virtual void display();
 	
 	/** Update the objects. */
-    virtual void update();
+    virtual int update();
 
     /** Handles a key press. */
     virtual void key();

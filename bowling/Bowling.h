@@ -9,6 +9,7 @@
 #include <sstream>
 
 #define MAX_PINS 10
+#define MAX_HIGH_SCORES 10
 
 using namespace std;
 
@@ -18,6 +19,7 @@ using namespace std;
 class Bowling : public RigidBodyApplication
 {
 	int window_width, window_height;
+	float aspect_ratio;
 
 	/** Tracks if a block has been hit. */
 	bool hit;
@@ -71,9 +73,13 @@ class Bowling : public RigidBodyApplication
 
 	//holds the ground
 	Ground* ground;
+	
+	//holds the name and the scores in the high scores file
+	string names[MAX_HIGH_SCORES];
+	int scores[MAX_HIGH_SCORES];
 
 	//Initialize Text displayer
-	FTGLPixmapFont font;
+	FTGLPixmapFont game_font;
 
 	//Models to be loaded
 	ModelLoader bowling_ball;
@@ -112,7 +118,7 @@ class Bowling : public RigidBodyApplication
     virtual void reset();
 
 	/** Processes the physics. */
-	virtual void update();
+	virtual int update();
 
 	//fire the bowling ball
 	void bowl();
@@ -149,11 +155,15 @@ class Bowling : public RigidBodyApplication
 	string intToString(int a);
 	GLfloat** generate_vector(int rows, int cols);
 	void delete_vector(GLfloat** my_vector, int row);
-	
 
 	//functions to load models and textures
 	int load_models();
 	int load_textures(string& texture_file);
+	
+	int load_high_scores();
+	int save_high_scores();
+	int update_high_scores(string name, int score);
+
 	void create_call_lists();
 	int generate_model_display_list(ModelLoader& model, GLuint model_call_list);
 	int generate_direction_display_list(GLuint& texture, GLuint model_call_list);
