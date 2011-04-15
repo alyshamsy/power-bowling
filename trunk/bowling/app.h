@@ -120,6 +120,8 @@ public:
 
 	virtual int getTextureValue(string& texture_name);
 
+	/** Resets the simulation. */
+    virtual void reset() = 0;
 };
 
 /**
@@ -144,6 +146,9 @@ public:
 
 	/** Display the particles. */
 	virtual void display();
+
+	/** Resets the simulation. */
+    virtual void reset() = 0;
 };
 
 /**
