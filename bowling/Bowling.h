@@ -4,9 +4,12 @@
 #include "Ground.h"
 #include "ModelLoader.h"
 #include "TextureLoader.h"
+#include <gl/glfw.h>
 #include <string>
 #include <FTGL/ftgl.h>
 #include <sstream>
+#include <iostream>
+#include <stdio.h>
 
 #define MAX_PINS 10
 #define MAX_HIGH_SCORES 10
@@ -29,6 +32,7 @@ class Bowling : public RigidBodyApplication
 	bool shot_reset;
 	bool display_score;
 	bool end_of_game;
+	bool start_game;
 
 	float current_time;
 	float spin;
@@ -99,6 +103,7 @@ class Bowling : public RigidBodyApplication
 	GLuint right_direction_list;
 	GLuint left_spin_list;
 	GLuint right_spin_list;
+	GLuint controls_display_list;
 	GLuint left_alley_list;
 	GLuint right_alley_list;
 
@@ -147,6 +152,7 @@ class Bowling : public RigidBodyApplication
 	//the 2 viewports to be drawn
 	void display_normal_screen();
 	void display_shot_screen();
+	bool display_instructions();
 
 	void display_end_of_game_screen();
 
@@ -168,6 +174,7 @@ class Bowling : public RigidBodyApplication
 	int generate_model_display_list(ModelLoader& model, GLuint model_call_list);
 	int generate_direction_display_list(GLuint& texture, GLuint model_call_list);
 	int generate_spin_display_list(GLuint& texture, GLuint model_call_list);
+	int generate_controls_display_list(GLuint& texture, GLuint model_call_list);
 
 public:
     /** Creates a new demo object. */

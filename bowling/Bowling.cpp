@@ -1,9 +1,4 @@
-#include <gl/glfw.h>
 #include "Bowling.h"
-#include <iostream>
-#include <stdio.h>
-
-using namespace std;
 
 #define DEG2RAD 0.0174532778f
 cyclone::Random global_random;
@@ -22,6 +17,7 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 	shot_reset = false;
 	display_score = false;
 	end_of_game = false;
+	start_game = false;
 
 	spin = 0.0f;
 	movement = 0.0f;
@@ -179,7 +175,7 @@ int Bowling::load_high_scores() {
 		return 1;
 	}
 
-	while(!read_high_scores.eof()/* && i <= 9*/) {
+	while(!read_high_scores.eof()) {
 		read_high_scores >> name >> score;
 
 		names[i] = name;
@@ -273,6 +269,7 @@ void Bowling::create_call_lists() {
 	right_direction_list = glGenLists(1);
 	left_spin_list = glGenLists(1);
 	right_spin_list = glGenLists(1);
+	controls_display_list = glGenLists(1);
 
 	//generate all the model display lists
 	generate_model_display_list(bowling_ball, ball_list);
@@ -282,17 +279,20 @@ void Bowling::create_call_lists() {
 	string right_direction = "right-arrow.tga";
 	string left_spin = "left-spin-arrow.tga";
 	string right_spin = "right-spin-arrow.tga";
+	string controls_display = "controls.tga";
 
 	GLuint left_direction_texture = getTextureValue(left_direction);
 	GLuint right_direction_texture = getTextureValue(right_direction);
 	GLuint left_spin_texture = getTextureValue(left_spin);
 	GLuint right_spin_texture = getTextureValue(right_spin);
+	GLuint controls_display_texture = getTextureValue(controls_display);
 
 	//generate the textures display lists
 	generate_direction_display_list(left_direction_texture, left_direction_list);
 	generate_direction_display_list(right_direction_texture, right_direction_list);
 	generate_spin_display_list(left_spin_texture, left_spin_list);
 	generate_spin_display_list(right_spin_texture, right_spin_list);
+	generate_controls_display_list(controls_display_texture, controls_display_list);
 }
 
 //generate the call list from the model and the call list value
@@ -431,6 +431,27 @@ int Bowling::generate_spin_display_list(GLuint& texture, GLuint model_call_list)
 	return 0;
 }
 
+//generate the display list for the controls texture
+int Bowling::generate_controls_display_list(GLuint& texture, GLuint model_call_list) {
+	if(model_call_list != 0) {
+		glNewList(model_call_list, GL_COMPILE);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glBegin(GL_QUADS);	
+				glTexCoord2f(1.0, 1.0); 
+				glVertex3f(4.0, 0.6, 0.0);
+				glTexCoord2f(1.0, 0.0); 
+				glVertex3f(4.0, -0.6, 0.0);
+				glTexCoord2f(0.0, 0.0); 
+				glVertex3f(-4.0, -0.6, 0.0);
+				glTexCoord2f(0.0, 1.0); 
+				glVertex3f(-4.0, 0.6, 0.0);
+			glEnd();
+		glEndList();
+	}
+
+	return 0;
+}
+
 void Bowling::generateContacts()
 {
 	hit = false;
@@ -509,7 +530,12 @@ void Bowling::generateContacts()
 void Bowling::reset()
 {
 	reset_frame();
+
+	srand((unsigned int)glfwGetTime());
+	ground_type = rand()%3 + 1;
+
 	end_of_game = false;
+	start_game = false;
 	bowling_shot = 0;
 	current_time = 0.0;
 	fire_timeout = 0.0;
@@ -779,8 +805,8 @@ int Bowling::update()
 			reset_frame();
 		}
 
-		if(bowling_shot == 2) {
-			int final_score = /*frame_score[9];*/ frame_score[0];
+		if(bowling_shot == 20) {
+			int final_score = frame_score[9]; //frame_score[0];
 
 			FTPoint high_score_name_text_position((window_width*0.455), window_height*0.445);
 
@@ -871,11 +897,11 @@ int Bowling::update()
 		current_floor_texture = wood_texture;
 		ball.body->setDamping(0.8f, 0.8f);
 	} else if(ground_type == 2) {
-		current_floor_texture = grass_texture;
-		ball.body->setDamping(0.6f, 0.6f);
-	} else if(ground_type == 3) {
 		current_floor_texture = ice_texture;
 		ball.body->setDamping(0.995f, 0.995f);
+	} else if(ground_type == 3) {
+		current_floor_texture = grass_texture;
+		ball.body->setDamping(0.6f, 0.6f);
 	} 
 
 	return 1;
@@ -1250,13 +1276,19 @@ void Bowling::display_end_of_game_screen() {
 	glPushMatrix();
 		ground->render(current_floor_texture);
 	glPopMatrix();
+	
+	//draw the controls
+	/*glPushMatrix();
+		glTranslatef(0.0, 0.0, 25.0);
+		glCallList(controls_display_list);
+	glPopMatrix();*/
 
 	//draw the score boxes
 	glPushMatrix();
 		glTranslatef(-10.0, 11.5, 15.0);
 		draw_score();
 	glPopMatrix();
-	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 }
 
 void Bowling::display_normal_screen() {
@@ -1319,6 +1351,12 @@ void Bowling::display_normal_screen() {
 	//draw the ground
 	glPushMatrix();
 		ground->render(current_floor_texture);
+	glPopMatrix();
+
+	//draw the controls
+	glPushMatrix();
+		glTranslatef(0.0, 1.1, 19.0);
+		glCallList(controls_display_list);
 	glPopMatrix();
 
 	//draw the left direction image
@@ -1451,8 +1489,75 @@ void Bowling::display_shot_screen() {
 	glPopMatrix();
 }
 
+bool Bowling::display_instructions() {
+	bool start = false;
+	int instructions, start_button;
+	double delay_time = glfwGetTime();
+
+	string instructions_image = "instructions.tga";
+	string start_button_image = "lets_bowl_button.tga";
+
+	instructions = getTextureValue(instructions_image);
+	start_button = getTextureValue(start_button_image);
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	while(!start) {
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0, 0.0, -5.0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, instructions);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			glTexCoord2f(0.0, 0.0);
+			glVertex3f(-5.0, -3.0, 0.0);
+			glTexCoord2f(0.0, 1.0);
+			glVertex3f(-5.0, 3.0, 0.0);
+			glTexCoord2f(1.0, 1.0);
+			glVertex3f(5.0, 3.0, 0.0);
+			glTexCoord2f(1.0, 0.0);
+			glVertex3f(5.0, -3.0, 0.0);
+		glEnd();   
+
+		glBindTexture(GL_TEXTURE_2D, start_button);
+		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+		glBegin(GL_QUADS);
+			glColor4f(1.0, 1.0, 0.0, 0.5);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-1.75, -2.5, 0.25);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-1.75, -2.0, 0.25);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(1.75, -2.0, 0.25);
+			glTexCoord2f(1.0, 0.0); glVertex3f(1.75, -2.5, 0.25);
+		glEnd();
+		glPopAttrib();
+
+		glfwSwapBuffers();
+
+		if(glfwGetKey( GLFW_KEY_ENTER ) && glfwGetTime() - delay_time >= 1.0) {
+			start = true;
+		}
+
+		glDisable(GL_BLEND);
+	}
+
+	return start;
+}
+
 void Bowling::display()
 {
+	while(!start_game) {
+		start_game = display_instructions();
+	}
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	GLfloat light_ambient[] = { 0.8, 0.8, 0.8, 1.0 };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };	
@@ -1469,7 +1574,6 @@ void Bowling::display()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	//glEnable(GL_LIGHT1);
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);

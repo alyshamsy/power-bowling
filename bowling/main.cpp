@@ -21,6 +21,9 @@
 #include <string>
 #include <FTGL/ftgl.h>
 #include <windows.h>
+#include <fstream>
+
+#define MAX_HIGH_SCORES 10
 
 using namespace std;
 
@@ -92,7 +95,7 @@ void init() {
     }
 
     float time = glfwGetTime();
-    while(glfwGetTime() - time <= 2.0) {
+    while(glfwGetTime() - time <= 3.0) {
         glClear( 0 | GL_DEPTH_BUFFER_BIT );
         
         if(success) {
@@ -113,40 +116,40 @@ void init() {
         glfwSwapBuffers();
     }
 
-	success = glfwReadImage("bin/images/logo.tga", &current_image, 0);
+	//success = glfwReadImage("bin/images/logo.tga", &current_image, 0);
 
-    if(success) {
-        glBindTexture(GL_TEXTURE_2D, logo_texture);
-                        
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+ //   if(success) {
+ //       glBindTexture(GL_TEXTURE_2D, logo_texture);
+ //                       
+ //       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+ //       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, current_image.Format, current_image.Width, current_image.Height, 0, current_image.Format, GL_UNSIGNED_BYTE, current_image.Data); // Texture specification
+ //       glTexImage2D(GL_TEXTURE_2D, 0, current_image.Format, current_image.Width, current_image.Height, 0, current_image.Format, GL_UNSIGNED_BYTE, current_image.Data); // Texture specification
 
-        glfwFreeImage(&current_image);
-    }
+ //       glfwFreeImage(&current_image);
+ //   }
 
-    time = glfwGetTime();
-    while(glfwGetTime() - time <= 4.0) {
-        glClear( 0 | GL_DEPTH_BUFFER_BIT );
+ //   time = glfwGetTime();
+ //   while(glfwGetTime() - time <= 4.0) {
+ //       glClear( 0 | GL_DEPTH_BUFFER_BIT );
 
-        if(success) {
-            glBindTexture(GL_TEXTURE_2D, logo_texture);
+ //       if(success) {
+ //           glBindTexture(GL_TEXTURE_2D, logo_texture);
 
-            glBegin(GL_QUADS);
-                glTexCoord2f(0.0, 0.0);
-                glVertex3f(-5.0, -3.0, 0.0);
-                glTexCoord2f(0.0, 1.0);
-                glVertex3f(-5.0, 3.0, 0.0);
-                glTexCoord2f(1.0, 1.0);
-                glVertex3f(5.0, 3.0, 0.0);
-                glTexCoord2f(1.0, 0.0);
-                glVertex3f(5.0, -3.0, 0.0);
-            glEnd();
-        } 
-        
-        glfwSwapBuffers();
-    }
+ //           glBegin(GL_QUADS);
+ //               glTexCoord2f(0.0, 0.0);
+ //               glVertex3f(-5.0, -3.0, 0.0);
+ //               glTexCoord2f(0.0, 1.0);
+ //               glVertex3f(-5.0, 3.0, 0.0);
+ //               glTexCoord2f(1.0, 1.0);
+ //               glVertex3f(5.0, 3.0, 0.0);
+ //               glTexCoord2f(1.0, 0.0);
+ //               glVertex3f(5.0, -3.0, 0.0);
+ //           glEnd();
+ //       } 
+ //       
+ //       glfwSwapBuffers();
+ //   }
 }
 
 //exits the game
@@ -213,7 +216,7 @@ int menu() {
 	int menu, new_game_button, game_controls_button, high_scores_button, quit_button;
 
 	double selection_time = glfwGetTime();
-	double enter_time = glfwGetTime();
+	double enter_time = selection_time;
 
 	/*FTPoint new_game_text_position((window_width*0.41), window_height*0.515);
 	FTPoint controls_text_position((window_width*0.37), window_height*0.375);
@@ -342,6 +345,227 @@ int menu() {
 	return selection_value;
 }
 
+//displays the game controls on the screen
+int game_controls() {
+	int control_system, back_button, return_value = 2;
+	double delay_time = glfwGetTime();
+
+	string control_system_image = "control-system.tga";
+	string back_button_image = "back_button.tga";
+
+	control_system = app->getTextureValue(control_system_image);
+	back_button = app->getTextureValue(back_button_image);
+
+	while(return_value == 2) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_LIGHTING);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0, 0.0, -5.0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, control_system);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-6.25, -4.0, 0.0);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-6.25, 4.0, 0.0);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(6.25, 4.0, 0.0);
+			glTexCoord2f(1.0, 0.0); glVertex3f(6.25, -4.0, 0.0);
+		glEnd();
+
+		glBindTexture(GL_TEXTURE_2D, back_button);
+		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+		glBegin(GL_QUADS);
+			glColor4f(1.0, 1.0, 0.0, 0.5);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-1.75, -3.25, 0.25);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-1.75, -2.75, 0.25);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(1.75, -2.75, 0.25);
+			glTexCoord2f(1.0, 0.0); glVertex3f(1.75, -3.25, 0.25);
+		glEnd();
+		glPopAttrib();
+
+		glfwSwapBuffers();
+
+		if(glfwGetKey( GLFW_KEY_ENTER ) && glfwGetTime() - delay_time >= 1.0) {
+			return_value = 0;
+		}
+	}
+
+	return return_value;
+}
+
+//displays the high scores
+int high_scores() {
+	//open the high scores file and load values into an array
+	string name, score, high_scores_file_name = "bin/high_scores.txt";
+	int i = 0;
+	bool error = false;
+	
+	//holds the name and the scores in the high scores file
+	string names[MAX_HIGH_SCORES];
+	string scores[MAX_HIGH_SCORES];
+
+	for(int i = 0; i < MAX_HIGH_SCORES; i++) {
+		names[i] = "";
+		scores[i] = "0";
+	}
+
+	fstream read_high_scores;
+
+	read_high_scores.open(high_scores_file_name, ios::in);
+	
+	if(read_high_scores) {
+		while(!read_high_scores.eof()) {
+			read_high_scores >> name >> score;
+
+			names[i] = name;
+			scores[i] = score;
+
+			i++;
+		}
+
+		read_high_scores.close();
+	}
+
+	FTPoint name_highscore1_position((window_width*0.35), window_height*0.55);
+	FTPoint name_highscore2_position((window_width*0.35), window_height*0.51);
+	FTPoint name_highscore3_position((window_width*0.35), window_height*0.47);
+	FTPoint name_highscore4_position((window_width*0.35), window_height*0.43);
+	FTPoint name_highscore5_position((window_width*0.35), window_height*0.39);
+	FTPoint name_highscore6_position((window_width*0.35), window_height*0.35);
+	FTPoint name_highscore7_position((window_width*0.35), window_height*0.31);
+	FTPoint name_highscore8_position((window_width*0.35), window_height*0.27);
+	FTPoint name_highscore9_position((window_width*0.35), window_height*0.23);
+	FTPoint name_highscore10_position((window_width*0.35), window_height*0.19);
+
+	FTPoint score_highscore1_position((window_width*0.64), window_height*0.55);
+	FTPoint score_highscore2_position((window_width*0.64), window_height*0.51);
+	FTPoint score_highscore3_position((window_width*0.64), window_height*0.47);
+	FTPoint score_highscore4_position((window_width*0.64), window_height*0.43);
+	FTPoint score_highscore5_position((window_width*0.64), window_height*0.39);
+	FTPoint score_highscore6_position((window_width*0.64), window_height*0.35);
+	FTPoint score_highscore7_position((window_width*0.64), window_height*0.31);
+	FTPoint score_highscore8_position((window_width*0.64), window_height*0.27);
+	FTPoint score_highscore9_position((window_width*0.64), window_height*0.23);
+	FTPoint score_highscore10_position((window_width*0.64), window_height*0.19);
+
+	int high_score_list, back_button, return_value = 3;
+	double delay_time = glfwGetTime();
+
+	string high_scores_list_image = "high-score-list.tga";
+	string back_button_image = "back_button.tga";
+
+	high_score_list = app->getTextureValue(high_scores_list_image);
+	back_button = app->getTextureValue(back_button_image);
+
+	while(return_value == 3) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_LIGHTING);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0, 0.0, -5.0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, high_score_list);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-6.25, -4.0, 0.0);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-6.25, 4.0, 0.0);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(6.25, 4.0, 0.0);
+			glTexCoord2f(1.0, 0.0); glVertex3f(6.25, -4.0, 0.0);
+		glEnd();
+
+		glBindTexture(GL_TEXTURE_2D, back_button);
+		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+		glBegin(GL_QUADS);
+			glColor4f(1.0, 1.0, 0.0, 0.5);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-1.75, -3.25, 0.25);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-1.75, -2.75, 0.25);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(1.75, -2.75, 0.25);
+			glTexCoord2f(1.0, 0.0); glVertex3f(1.75, -3.25, 0.25);
+		glEnd();
+		glPopAttrib();
+
+		glPixelTransferf(GL_RED_BIAS, -1.0f);
+		glPixelTransferf(GL_GREEN_BIAS, -1.0f);
+		glPixelTransferf(GL_BLUE_BIAS, -1.0f);
+
+		if(scores[0].compare("0") != 0) {
+			display_text(names[0], name_highscore1_position, 24);
+			display_text(scores[0], score_highscore1_position, 24);
+		}
+
+		if(scores[1].compare("0") != 0) {
+			display_text(names[1], name_highscore2_position, 24);
+			display_text(scores[1], score_highscore2_position, 24);
+		}
+
+		if(scores[2].compare("0") != 0) {
+			display_text(names[2], name_highscore3_position, 24);
+			display_text(scores[2], score_highscore3_position, 24);
+		}
+
+		if(scores[3].compare("0") != 0) {
+			display_text(names[3], name_highscore4_position, 24);
+			display_text(scores[3], score_highscore4_position, 24);
+		}
+
+		if(scores[4].compare("0") != 0) {
+			display_text(names[4], name_highscore5_position, 24);
+			display_text(scores[4], score_highscore5_position, 24);
+		}
+
+		if(scores[5].compare("0") != 0) {
+			display_text(names[5], name_highscore6_position, 24);
+			display_text(scores[5], score_highscore6_position, 24);
+		}
+
+		if(scores[6].compare("0") != 0) {
+			display_text(names[6], name_highscore7_position, 24);
+			display_text(scores[6], score_highscore7_position, 24);
+		}
+
+		if(scores[7].compare("0") != 0) {
+			display_text(names[7], name_highscore8_position, 24);
+			display_text(scores[7], score_highscore8_position, 24);
+		}
+
+		if(scores[8].compare("0") != 0) {
+			display_text(names[8], name_highscore9_position, 24);
+			display_text(scores[8], score_highscore9_position, 24);
+		}
+
+		if(scores[9].compare("0") != 0) {
+			display_text(names[9], name_highscore10_position, 24);
+			display_text(scores[9], score_highscore10_position, 24);
+		}
+
+		glfwSwapBuffers();
+
+		if(glfwGetKey( GLFW_KEY_ENTER ) && glfwGetTime() - delay_time >= 1.0) {
+			return_value = 0;
+		}
+	}
+
+	return return_value;
+}
+
 /**
  * The main entry point. We pass arguments onto GLUT.
  */
@@ -358,8 +582,8 @@ int main()
 	bool pause_game = false;
 
 	FTPoint paused_text_position((window_width*0.39), window_height*0.75);
-	FTPoint yes_text_position((window_width*0.40), window_height*0.42);
-	FTPoint no_text_position((window_width*0.575), window_height*0.42);
+	FTPoint yes_text_position((window_width*0.40), window_height*0.385);
+	FTPoint no_text_position((window_width*0.575), window_height*0.385);
 
 	//initialize the openGL window
 	init();
@@ -411,10 +635,10 @@ int main()
 				glBindTexture(GL_TEXTURE_2D, exit_box);
 				glBegin(GL_QUADS);
 					glColor3f(1.0, 1.0, 1.0);
-					glTexCoord2f(0.0, 0.0); glVertex3f(-2.25, -1.0, 0.0);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(-2.25, 1.0, 0.0);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(2.25, 1.0, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(2.25, -1.0, 0.0);
+					glTexCoord2f(0.0, 0.0); glVertex3f(-2.25, -1.5, 0.0);			
+					glTexCoord2f(0.0, 1.0); glVertex3f(-2.25, 1.5, 0.0);			
+					glTexCoord2f(1.0, 1.0); glVertex3f(2.25, 1.5, 0.0);
+					glTexCoord2f(1.0, 0.0); glVertex3f(2.25, -1.5, 0.0);
 				glEnd();
 
 				glBindTexture(GL_TEXTURE_2D, button);
@@ -424,10 +648,10 @@ int main()
 					if(select_exit_value == 1) {
 						glColor4f(1.0, 1.0, 0.0, 0.5);
 					}
-					glTexCoord2f(0.0, 0.0); glVertex3f(-1.5, -0.75, 0.25);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(-1.5, -0.25, 0.25);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.25, 0.25);
-					glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.75, 0.25);
+					glTexCoord2f(0.0, 0.0); glVertex3f(-1.5, -1.0, 0.25);			
+					glTexCoord2f(0.0, 1.0); glVertex3f(-1.5, -0.5, 0.25);			
+					glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.5, 0.25);
+					glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -1.0, 0.25);
 				glEnd();
 				glPopAttrib();
 
@@ -438,12 +662,16 @@ int main()
 					if(select_exit_value == 0) {
 						glColor4f(1.0, 1.0, 0.0, 0.5);
 					}
-					glTexCoord2f(0.0, 0.0); glVertex3f(1.5, -0.75, 0.25);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(1.5, -0.25, 0.25);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(0.5, -0.25, 0.25);
-					glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -0.75, 0.25);
+					glTexCoord2f(0.0, 0.0); glVertex3f(1.5, -1.0, 0.25);			
+					glTexCoord2f(0.0, 1.0); glVertex3f(1.5, -0.5, 0.25);			
+					glTexCoord2f(1.0, 1.0); glVertex3f(0.5, -0.5, 0.25);
+					glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -1.0, 0.25);
 				glEnd();
 				glPopAttrib();
+
+				glPixelTransferf(GL_RED_BIAS, 0.0f);
+				glPixelTransferf(GL_GREEN_BIAS, 0.0f);
+				glPixelTransferf(GL_BLUE_BIAS, 0.0f);
 
 				display_text("Game Paused", paused_text_position, 50);
 				display_text("Yes", yes_text_position, 24);
@@ -461,6 +689,7 @@ int main()
 					pause_game = false;
 					running = 0;
 					//rest the game before exiting
+					app->reset();
 				} else if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 0) {
 					pause_game = false;
 
@@ -475,6 +704,14 @@ int main()
 					running = 4;
 				}
 			}
+		}
+
+		if(running == 2) {
+			running = game_controls();
+		}
+
+		if(running == 3) {
+			running = high_scores();
 		}
 	}
 
