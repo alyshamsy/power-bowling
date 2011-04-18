@@ -35,6 +35,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="MtlHandler.cpp" />
     <ClCompile Include="Pins.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TextureVertex.cpp" />
     <ClCompile Include="timing.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="MtlHandler.h" />
     <ClInclude Include="Pins.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureVertex.h" />
     <ClInclude Include="timing.h" />
@@ -109,8 +111,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib-glfw/debug;lib-ftgl/debug;lib-freetype;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib-glfw/debug;lib-ftgl/debug;lib-freetype;lib-openAL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl_D.lib;alut.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,14 +121,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../lib-glfw/release;../lib-ftgl/release;../lib-freetype;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib-glfw/release;lib-ftgl/release;lib-freetype;lib-openAL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw.lib;winmm.lib;ftgl.lib;alut.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

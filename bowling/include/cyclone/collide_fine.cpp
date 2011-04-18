@@ -515,10 +515,10 @@ unsigned CollisionDetector::boxAndBox(
         ptOnOneEdge = one.transform * ptOnOneEdge;
         ptOnTwoEdge = two.transform * ptOnTwoEdge;
 
-        //*
+        /*
         glPushMatrix();
         glColor3f(1,0,0);
-        glTranslatef(ptOnOneEdge.x, ptOnOneEdge.y, ptOnOneEdge.z);
+        glTranslatef(-ptOnOneEdge.x, -ptOnOneEdge.y, -ptOnOneEdge.z);
 		GLUquadric* sphere_quad;
 		sphere_quad = gluNewQuadric();
         gluSphere(sphere_quad, 0.1, 10, 10);
@@ -547,7 +547,7 @@ unsigned CollisionDetector::boxAndBox(
             ptOnTwoEdge.y + twoAxis.y,
             ptOnTwoEdge.z + twoAxis.z);
         glEnd();
-        /**/
+        */
 
         // So we have a point and a direction for the colliding edges.
         // We need to find out point of closes approach of the two 
@@ -685,8 +685,7 @@ unsigned CollisionDetector::boxAndSphere(
     contact->contactNormal.normalise();
     contact->contactPoint = closestPtWorld;
     contact->penetration = sphere.radius - real_sqrt(dist);
-    contact->setBodyData(box.body, sphere.body,
-        data->friction, data->restitution);
+    contact->setBodyData(box.body, sphere.body, data->friction, data->restitution);
 
     data->addContacts(1);
     return 1;

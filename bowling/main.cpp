@@ -18,6 +18,8 @@
 // Include the timing functions
 #include "timing.h"
 
+#include "Sound.h"
+
 #include <string>
 #include <FTGL/ftgl.h>
 #include <windows.h>
@@ -38,6 +40,8 @@ Application* app;
 int window_width = 1280, window_height = 800;
 float aspect_ratio;
 FTGLPixmapFont font("bin/fonts/calibrib.ttf");
+
+Sound game_sounds;
 
 void init() {
 	GLuint logo_texture;
@@ -62,10 +66,6 @@ void init() {
 	}
 
 	glfwSetWindowTitle("Power Bowling");
-
-	app = getApplication();
-	TimingData::init();
-	app->initGraphics();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -95,7 +95,7 @@ void init() {
     }
 
     float time = glfwGetTime();
-    while(glfwGetTime() - time <= 3.0) {
+    while(glfwGetTime() - time <= 1.0) {
         glClear( 0 | GL_DEPTH_BUFFER_BIT );
         
         if(success) {
@@ -116,40 +116,11 @@ void init() {
         glfwSwapBuffers();
     }
 
-	//success = glfwReadImage("bin/images/logo.tga", &current_image, 0);
-
- //   if(success) {
- //       glBindTexture(GL_TEXTURE_2D, logo_texture);
- //                       
- //       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
- //       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
- //       glTexImage2D(GL_TEXTURE_2D, 0, current_image.Format, current_image.Width, current_image.Height, 0, current_image.Format, GL_UNSIGNED_BYTE, current_image.Data); // Texture specification
-
- //       glfwFreeImage(&current_image);
- //   }
-
- //   time = glfwGetTime();
- //   while(glfwGetTime() - time <= 4.0) {
- //       glClear( 0 | GL_DEPTH_BUFFER_BIT );
-
- //       if(success) {
- //           glBindTexture(GL_TEXTURE_2D, logo_texture);
-
- //           glBegin(GL_QUADS);
- //               glTexCoord2f(0.0, 0.0);
- //               glVertex3f(-5.0, -3.0, 0.0);
- //               glTexCoord2f(0.0, 1.0);
- //               glVertex3f(-5.0, 3.0, 0.0);
- //               glTexCoord2f(1.0, 1.0);
- //               glVertex3f(5.0, 3.0, 0.0);
- //               glTexCoord2f(1.0, 0.0);
- //               glVertex3f(5.0, -3.0, 0.0);
- //           glEnd();
- //       } 
- //       
- //       glfwSwapBuffers();
- //   }
+	alutInit(0, 0) ;
+	app = getApplication();
+	TimingData::init();
+	app->initGraphics();
+	game_sounds.initialize();
 }
 
 //exits the game
@@ -235,7 +206,12 @@ int menu() {
 	high_scores_button = app->getTextureValue(high_scores_button_image);
 	quit_button = app->getTextureValue(quit_button_image);
 
+	game_sounds.setSoundSourcePosition(0.0, 0.0, 0.0);
 	while(selection_value == 0) {
+		if(!glfwGetWindowParam( GLFW_OPENED )) {
+			selection_value = 4;
+		}
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDisable(GL_LIGHTING);
@@ -323,9 +299,11 @@ int menu() {
 		glfwSwapBuffers();
 
 		if(glfwGetKey( GLFW_KEY_UP ) && glfwGetTime() - selection_time >= 0.25) {
+			game_sounds.playSound("menu-change.wav");
 			current_selection--;
 			selection_time = glfwGetTime();
 		} else if(glfwGetKey( GLFW_KEY_DOWN ) && glfwGetTime() - selection_time >= 0.25) {
+			game_sounds.playSound("menu-change.wav");
 			current_selection++;
 			selection_time = glfwGetTime();
 		}
@@ -342,6 +320,7 @@ int menu() {
 		}
 	}
 
+	game_sounds.stopSound("b.wav");
 	return selection_value;
 }
 
@@ -567,156 +546,78 @@ int high_scores() {
 }
 
 /**
- * The main entry point. We pass arguments onto GLUT.
+ * The main entry point. We pass arguments onto GLFW.
  */
 int main()
 {
 	int running = 0;
 	int game_end = 0;
 	int select_exit_value = 0;
-	int exit_box;
+	/*int exit_box;
 	int button;
 
 	double pause_time = 0.0;
+	double selection_time = glfwGetTime();
 
-	bool pause_game = false;
+	bool pause_game = false;*/
+	bool menu_sound = false;
 
-	FTPoint paused_text_position((window_width*0.39), window_height*0.75);
+	/*FTPoint paused_text_position((window_width*0.39), window_height*0.75);
 	FTPoint yes_text_position((window_width*0.40), window_height*0.385);
-	FTPoint no_text_position((window_width*0.575), window_height*0.385);
+	FTPoint no_text_position((window_width*0.575), window_height*0.385);*/
 
 	//initialize the openGL window
 	init();
 
-	string exit_box_image = "exit-box.tga";
+	/*string exit_box_image = "exit-box.tga";
 	string button_image = "button.tga";
 
 	exit_box = app->getTextureValue(exit_box_image);
-	button = app->getTextureValue(button_image);
+	button = app->getTextureValue(button_image);*/
 
 	// Main loop
 	while (running != 4) {
+		if(menu_sound == false) {
+			game_sounds.playSound("initial-sound.wav");
+			menu_sound = true;
+		}
+
 		running = menu();
 		select_exit_value = 0;
 
 		while( running == 1 ) {
+			game_sounds.stopSound("initial-sound.wav");
+			menu_sound = false;
 			glDisable(GL_BLEND);
 
-			running = glfwGetWindowParam( GLFW_OPENED );
-
-			//updates the world
-			running = update();
-
-			keyboard();
+			if(!glfwGetWindowParam( GLFW_OPENED )) {
+				running = 4;
+			}
 
 			//sets up the camera for the game
 			display();
 
-			//Check if ESC key	was pressed or window was closed. if yes add the window to ask if you want to quit
-			pause_time = glfwGetTime();
-			while(glfwGetKey( GLFW_KEY_ESC ) || pause_game) {
-				pause_game = true;
+			//get the keys pressed
+			keyboard();
 
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				glDisable(GL_LIGHTING);
-
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-				gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
-
-				glMatrixMode(GL_MODELVIEW);
-				glLoadIdentity();
-				glTranslatef(0.0, 0.0, -5.0);
-
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-				glBindTexture(GL_TEXTURE_2D, exit_box);
-				glBegin(GL_QUADS);
-					glColor3f(1.0, 1.0, 1.0);
-					glTexCoord2f(0.0, 0.0); glVertex3f(-2.25, -1.5, 0.0);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(-2.25, 1.5, 0.0);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(2.25, 1.5, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(2.25, -1.5, 0.0);
-				glEnd();
-
-				glBindTexture(GL_TEXTURE_2D, button);
-				glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
-				glBegin(GL_QUADS);
-					glColor3f(1.0, 1.0, 1.0);
-					if(select_exit_value == 1) {
-						glColor4f(1.0, 1.0, 0.0, 0.5);
-					}
-					glTexCoord2f(0.0, 0.0); glVertex3f(-1.5, -1.0, 0.25);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(-1.5, -0.5, 0.25);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.5, 0.25);
-					glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -1.0, 0.25);
-				glEnd();
-				glPopAttrib();
-
-				glBindTexture(GL_TEXTURE_2D, button);
-				glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
-				glBegin(GL_QUADS);
-					glColor3f(1.0, 1.0, 1.0);
-					if(select_exit_value == 0) {
-						glColor4f(1.0, 1.0, 0.0, 0.5);
-					}
-					glTexCoord2f(0.0, 0.0); glVertex3f(1.5, -1.0, 0.25);			
-					glTexCoord2f(0.0, 1.0); glVertex3f(1.5, -0.5, 0.25);			
-					glTexCoord2f(1.0, 1.0); glVertex3f(0.5, -0.5, 0.25);
-					glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -1.0, 0.25);
-				glEnd();
-				glPopAttrib();
-
-				glPixelTransferf(GL_RED_BIAS, 0.0f);
-				glPixelTransferf(GL_GREEN_BIAS, 0.0f);
-				glPixelTransferf(GL_BLUE_BIAS, 0.0f);
-
-				display_text("Game Paused", paused_text_position, 50);
-				display_text("Yes", yes_text_position, 24);
-				display_text("No", no_text_position, 24);
-
-				glfwSwapBuffers();
-
-				if(glfwGetKey( GLFW_KEY_RIGHT )) {
-					select_exit_value = 0;
-				} else if(glfwGetKey( GLFW_KEY_LEFT )) {
-					select_exit_value = 1;
-				}
-
-				if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 1) {
-					pause_game = false;
-					running = 0;
-					//rest the game before exiting
-					app->reset();
-				} else if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 0) {
-					pause_game = false;
-
-					glEnable(GL_LIGHTING);
-					glDisable(GL_BLEND);
-
-					glfwSetTime(pause_time);
-				}
-
-				if(!glfwGetWindowParam( GLFW_OPENED )) {
-					pause_game = false;
-					running = 4;
-				}
-			}
+			//updates the world
+			running = update();
 		}
 
 		if(running == 2) {
+			game_sounds.stopSound("initial-sound.wav");
 			running = game_controls();
 		}
 
 		if(running == 3) {
+			game_sounds.stopSound("initial-sound.wav");
 			running = high_scores();
 		}
 	}
 
 	//exit the openGL window
 	if(running == 4) {
+		game_sounds.stopAllSounds();
 		exit();
 	}
 	

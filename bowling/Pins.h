@@ -11,6 +11,7 @@ class Pins : public cyclone::CollisionBox
 public:
     bool exists;
 	bool collide;
+	bool isOverlapping;
 
 	Pins();
 	~Pins();
