@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bowling", "bowling\bowling.vcxproj", "{8B451013-FF52-466D-83AC-7CC6E56D1581}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Power Bowling", "Power Bowling\Power Bowling.vdproj", "{8303F927-A63D-4F23-B963-633914860FA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,8 @@ Global
 		{8B451013-FF52-466D-83AC-7CC6E56D1581}.Debug|Win32.Build.0 = Debug|Win32
 		{8B451013-FF52-466D-83AC-7CC6E56D1581}.Release|Win32.ActiveCfg = Release|Win32
 		{8B451013-FF52-466D-83AC-7CC6E56D1581}.Release|Win32.Build.0 = Release|Win32
+		{8303F927-A63D-4F23-B963-633914860FA6}.Debug|Win32.ActiveCfg = Debug
+		{8303F927-A63D-4F23-B963-633914860FA6}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -644,7 +644,7 @@ void Bowling::reset_frame() {
 		pins[i].body->setOrientation(1,0,0,0);
 		pins[i].body->setVelocity(0,0,0);
 		pins[i].body->setRotation(0,0,0);
-		pins[i].body->setMass(25.0f);
+		pins[i].body->setMass(15.0f);
 		cyclone::Matrix3 it;
 		it.setBlockInertiaTensor(pins[0].halfSize, pins[i].body->getMass());
 		pins[i].body->setInertiaTensor(it);
@@ -736,7 +736,7 @@ void Bowling::reset_shot() {
 			pins[i].body->setOrientation(1,0,0,0);
 			pins[i].body->setVelocity(0,0,0);
 			pins[i].body->setRotation(0,0,0);
-			pins[i].body->setMass(25.0f);
+			pins[i].body->setMass(15.0f);
 			cyclone::Matrix3 it;
 			it.setBlockInertiaTensor(pins[0].halfSize, pins[i].body->getMass());
 			pins[i].body->setInertiaTensor(it);
@@ -1784,6 +1784,7 @@ void Bowling::pause_game() {
 
 		if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 1) {
 			game_paused = false;
+			game_sound.stopAllSounds();
 			exit = 0;
 		} else if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 0) {
 			game_paused = false;
