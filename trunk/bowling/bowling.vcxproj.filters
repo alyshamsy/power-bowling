@@ -199,5 +199,8 @@
     <None Include="bin\images\textures.txt">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="bin\sounds\sounds.txt">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
