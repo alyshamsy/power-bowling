@@ -11,6 +11,8 @@
 class Gutter : public cyclone::CollisionBox
 {
 public:
+	bool isOverlapping;
+
     Gutter();
 	~Gutter();
 

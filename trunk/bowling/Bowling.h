@@ -4,6 +4,7 @@
 #include "Ground.h"
 #include "ModelLoader.h"
 #include "TextureLoader.h"
+#include "Sound.h"
 #include <gl/glfw.h>
 #include <string>
 #include <FTGL/ftgl.h>
@@ -33,6 +34,7 @@ class Bowling : public RigidBodyApplication
 	bool display_score;
 	bool end_of_game;
 	bool start_game;
+	bool sound_played;
 
 	float current_time;
 	float spin;
@@ -56,6 +58,8 @@ class Bowling : public RigidBodyApplication
 	int ice_texture;
 	int wood_texture;
 	int current_floor_texture;
+
+	int exit;
 
 	unsigned pin_contact;
 
@@ -107,6 +111,8 @@ class Bowling : public RigidBodyApplication
 	GLuint left_alley_list;
 	GLuint right_alley_list;
 
+	Sound game_sound;
+
 	//Holds the score
 	int game_score[20];
 	int frame_score[10];
@@ -155,6 +161,8 @@ class Bowling : public RigidBodyApplication
 	bool display_instructions();
 
 	void display_end_of_game_screen();
+
+	void pause_game();
 
 	//Helper functions
 	void display_text(string text, FTPoint& position, unsigned int size);

@@ -13,6 +13,8 @@
 class BackWall : public cyclone::CollisionBox
 {
 public:
+	bool isOverlapping;
+
     BackWall();
 	~BackWall();
 

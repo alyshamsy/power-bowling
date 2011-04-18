@@ -18,6 +18,7 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 	display_score = false;
 	end_of_game = false;
 	start_game = false;
+	sound_played = false;
 
 	spin = 0.0f;
 	movement = 0.0f;
@@ -26,7 +27,7 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 	fire_timeout = 0.0;
 	ground_change = 0.0;
 
-	friction_value = 0.7;
+	friction_value = 0.9;
 
 	shot = 0;
 	score = 0;
@@ -35,6 +36,8 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 	bowling_shot = 0;
 
 	ground_type = 1;
+
+	exit = 1;
 
 	for(int i = 0; i < 20; i++) {
 		game_score[i] = -1;
@@ -51,7 +54,7 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 
 	// Create the ball.
 	ball.body = new cyclone::RigidBody();
-	ball.radius = 0.5f;
+	ball.radius = 1.0f;
 	ball.body->setMass(30.0f);
 	ball.body->setDamping(0.8f, 0.8f);
 	cyclone::Matrix3 it;
@@ -68,6 +71,8 @@ Bowling::Bowling():RigidBodyApplication(), game_font("bin/fonts/trebuc.ttf")
 	ground = new Ground();
 
 	initialize();
+
+	game_sound.initialize();
 
     // Set up the initial block
     reset();
@@ -472,15 +477,34 @@ void Bowling::generateContacts()
 	cyclone::Vector3 position, otherPosition;
 	for (Pins *pin = pins; pin < pins+MAX_PINS; pin++)
 	{
-		if (!pin->exists) continue;
+		if (!pin->exists) 
+			continue;
 
 		cyclone::Matrix3 it;
 		it.setBlockInertiaTensor(pin->halfSize, 4.0f);
 
 		// Check for collisions with the ground plane
-		if (!cData.hasMoreContacts()) return;
+		if (!cData.hasMoreContacts()) 
+			return;
+
 		cyclone::CollisionDetector::boxAndHalfSpace(*pin, plane, &cData);
 
+		if(cyclone::CollisionDetector::boxAndBox(*pin, *wall, &cData) == 1) {
+			pin->body->setVelocity(0.0, 0.0, 0.0);
+			pin->body->setAcceleration(cyclone::Vector3::GRAVITY);
+		}
+
+		if(cyclone::CollisionDetector::boxAndBox(*pin, *left_gutter, &cData) == 1) {
+			pin->body->setVelocity(0.0, 0.0, 0.0);
+			pin->body->setAcceleration(cyclone::Vector3::GRAVITY);
+		}
+
+		if(cyclone::CollisionDetector::boxAndBox(*pin, *right_gutter, &cData) == 1) {
+			pin->body->setVelocity(0.0, 0.0, 0.0);
+			pin->body->setAcceleration(cyclone::Vector3::GRAVITY);
+		}
+		
+		
 		if (ball_active)
 		{
 			// And with the sphere
@@ -490,6 +514,14 @@ void Bowling::generateContacts()
 				hit = true;
 				pin_contact = cData.contactCount-1;
 				pin->collide = true;
+
+				if(sound_played == false) {
+					game_sound.stopSound("bowling-ball.wav");
+					game_sound.setSoundSourcePosition(pin->body->getPosition().x, pin->body->getPosition().y, pin->body->getPosition().z);
+					game_sound.playSound("pins-break.wav");
+					sound_played = true;
+				}
+
 				pin->body->setAcceleration(cyclone::Vector3::GRAVITY);
 
 				pin->body->setInertiaTensor(it);
@@ -503,16 +535,15 @@ void Bowling::generateContacts()
 			cyclone::CollisionDetector::boxAndSphere(*right_gutter, ball, &cData);
 		}
 
-		cyclone::CollisionDetector::boxAndBox(*pin, *wall, &cData);
-		cyclone::CollisionDetector::boxAndBox(*pin, *left_gutter, &cData);
-		cyclone::CollisionDetector::boxAndBox(*pin, *right_gutter, &cData);
-
 		// Check for collisions with each other box
 		for (Pins *other = pin+1; other < pins+MAX_PINS; other++)
 		{
-			if (!other->exists) continue;
+			if (!other->exists) 
+				continue;
 
-			if (!cData.hasMoreContacts()) return;
+			if (!cData.hasMoreContacts()) 
+				return;
+
 			cyclone::CollisionDetector::boxAndBox(*pin, *other, &cData);
 			other->body->setAcceleration(cyclone::Vector3::GRAVITY);
 			other->body->setInertiaTensor(it);
@@ -540,12 +571,13 @@ void Bowling::reset()
 	current_time = 0.0;
 	fire_timeout = 0.0;
 	glfwSetTime(0.0);
+	exit = 1;
 }
 
 void Bowling::reset_frame() {
 	bowled = false;
 	shot_reset = true;
-
+	sound_played = false;
 	spin = 0.0f;
 	movement = 0.0f;
 	power = 5.0f;
@@ -612,7 +644,7 @@ void Bowling::reset_frame() {
 		pins[i].body->setOrientation(1,0,0,0);
 		pins[i].body->setVelocity(0,0,0);
 		pins[i].body->setRotation(0,0,0);
-		pins[i].body->setMass(10.0f);
+		pins[i].body->setMass(25.0f);
 		cyclone::Matrix3 it;
 		it.setBlockInertiaTensor(pins[0].halfSize, pins[i].body->getMass());
 		pins[i].body->setInertiaTensor(it);
@@ -651,6 +683,7 @@ void Bowling::reset_shot() {
 	
 	bowled = false;
 	shot_reset = true;
+	sound_played = false;
 
 	spin = 0.0f;
 	movement = 0.0f;
@@ -703,7 +736,7 @@ void Bowling::reset_shot() {
 			pins[i].body->setOrientation(1,0,0,0);
 			pins[i].body->setVelocity(0,0,0);
 			pins[i].body->setRotation(0,0,0);
-			pins[i].body->setMass(10.0f);
+			pins[i].body->setMass(25.0f);
 			cyclone::Matrix3 it;
 			it.setBlockInertiaTensor(pins[0].halfSize, pins[i].body->getMass());
 			pins[i].body->setInertiaTensor(it);
@@ -789,12 +822,32 @@ void Bowling::bowl() {
 	ball.calculateInternals();
 
 	hit = false;
+
+	game_sound.setSoundSourcePosition(ball.body->getPosition().x, ball.body->getPosition().y, ball.body->getPosition().z);
+	game_sound.playSound("bowling-ball.wav");
 }
 
 int Bowling::update()
 {
+	if(!glfwGetWindowParam( GLFW_OPENED )) {
+		exit = 4;
+	}
+
+	if(exit == 0) {
+		reset();
+		return 0;
+	}
+
+	if(exit == 4) {
+		return 4;
+	}
+
 	RigidBodyApplication::update();
 	
+	if(hit == false) {
+		game_sound.setSoundSourcePosition(ball.body->getPosition().x, ball.body->getPosition().y, ball.body->getPosition().z);
+	}
+
 	//reset the next shot or the next frame
 	if(glfwGetTime() - current_time >= 10.0 && bowled == true) {
 		calculate_score();
@@ -827,6 +880,10 @@ int Bowling::update()
 			
 			//check the score and if it is a high score then ask for name and call update_high_scores
 			if(final_score > scores[MAX_HIGH_SCORES - 1]) {
+				game_sound.setSoundSourcePosition(0.0, 0.0, 0.0);
+				game_sound.increaseSoundVolume("tada.wav", 2.0);
+				game_sound.playSound("tada.wav");
+
 				bool name_entered = false;
 				int high_score_name_box;
 				string high_score_name_box_image = "high-score-box.tga";
@@ -904,7 +961,7 @@ int Bowling::update()
 		ball.body->setDamping(0.6f, 0.6f);
 	} 
 
-	return 1;
+	return exit;
 }
 
 void Bowling::updateObjects(cyclone::real duration)
@@ -1182,6 +1239,7 @@ void Bowling::draw_left_side_alleys() {
 			glPopMatrix();
 
 			//draw the ground
+			current_floor_texture = wood_texture;
 			glPushMatrix();
 				ground->render(current_floor_texture);
 			glPopMatrix();
@@ -1217,6 +1275,7 @@ void Bowling::draw_right_side_alleys() {
 			glPopMatrix();
 
 			//draw the ground
+			current_floor_texture = wood_texture;
 			glPushMatrix();
 				ground->render(current_floor_texture);
 			glPopMatrix();
@@ -1503,6 +1562,11 @@ bool Bowling::display_instructions() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	while(!start) {
+		if(!glfwGetWindowParam( GLFW_OPENED )) {
+			start = true;
+			exit = 4;
+		}
+
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		glMatrixMode(GL_PROJECTION);
@@ -1620,6 +1684,125 @@ void Bowling::display()
 	RigidBodyApplication::drawDebug();
 }
 
+void Bowling::pause_game() {
+	//double pause_time = glfwGetTime();
+	bool game_paused = true;
+
+	int select_exit_value = 0;
+	int exit_box;
+	int button;
+
+	double pause_time = 0.0;
+	double selection_time = glfwGetTime();
+
+	FTPoint paused_text_position((window_width*0.39), window_height*0.75);
+	FTPoint yes_text_position((window_width*0.40), window_height*0.385);
+	FTPoint no_text_position((window_width*0.575), window_height*0.385);
+
+	string exit_box_image = "exit-box.tga";
+	string button_image = "button.tga";
+
+	exit_box = getTextureValue(exit_box_image);
+	button = getTextureValue(button_image);
+
+	game_sound.pauseAllSounds();
+
+	while(game_paused) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_LIGHTING);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(75.0, aspect_ratio, 1.0, 20000.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0, 0.0, -5.0);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, exit_box);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			glTexCoord2f(0.0, 0.0); glVertex3f(-2.25, -1.5, 0.0);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-2.25, 1.5, 0.0);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(2.25, 1.5, 0.0);
+			glTexCoord2f(1.0, 0.0); glVertex3f(2.25, -1.5, 0.0);
+		glEnd();
+
+		glBindTexture(GL_TEXTURE_2D, button);
+		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			if(select_exit_value == 1) {
+				glColor4f(1.0, 1.0, 0.0, 0.5);
+			}
+			glTexCoord2f(0.0, 0.0); glVertex3f(-1.5, -1.0, 0.25);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(-1.5, -0.5, 0.25);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.5, 0.25);
+			glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -1.0, 0.25);
+		glEnd();
+		glPopAttrib();
+
+		glBindTexture(GL_TEXTURE_2D, button);
+		glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0);
+			if(select_exit_value == 0) {
+				glColor4f(1.0, 1.0, 0.0, 0.5);
+			}
+			glTexCoord2f(0.0, 0.0); glVertex3f(1.5, -1.0, 0.25);			
+			glTexCoord2f(0.0, 1.0); glVertex3f(1.5, -0.5, 0.25);			
+			glTexCoord2f(1.0, 1.0); glVertex3f(0.5, -0.5, 0.25);
+			glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -1.0, 0.25);
+		glEnd();
+		glPopAttrib();
+
+		glPixelTransferf(GL_RED_BIAS, 0.0f);
+		glPixelTransferf(GL_GREEN_BIAS, 0.0f);
+		glPixelTransferf(GL_BLUE_BIAS, 0.0f);
+
+		display_text("Game Paused", paused_text_position, 50);
+		display_text("Yes", yes_text_position, 24);
+		display_text("No", no_text_position, 24);
+
+		glfwSwapBuffers();
+
+		if(glfwGetKey( GLFW_KEY_RIGHT ) && glfwGetTime() - selection_time >= 0.25) {
+			game_sound.setSoundSourcePosition(0.0, 0.0, 0.0);
+			game_sound.playSound("menu-change.wav");
+			select_exit_value = 0;
+			selection_time = glfwGetTime();
+		} else if(glfwGetKey( GLFW_KEY_LEFT ) && glfwGetTime() - selection_time >= 0.25) {
+			game_sound.setSoundSourcePosition(0.0, 0.0, 0.0);
+			game_sound.playSound("menu-change.wav");
+			select_exit_value = 1;
+			selection_time = glfwGetTime();
+		}
+
+		if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 1) {
+			game_paused = false;
+			exit = 0;
+		} else if(glfwGetKey( GLFW_KEY_ENTER ) && select_exit_value == 0) {
+			game_paused = false;
+
+			glEnable(GL_LIGHTING);
+			glDisable(GL_BLEND);
+
+			glfwSetTime(pause_time);
+
+			game_sound.stopSound("menu-change.wav");
+			game_sound.playAllSounds();
+		}
+
+		if(!glfwGetWindowParam( GLFW_OPENED )) {
+			exit = 4;
+		}
+	}
+}
+
 void Bowling::key()
 {
 	if(glfwGetKey('G') == GLFW_PRESS && glfwGetTime() - ground_change > 0.5 && shot_reset == true) {
@@ -1659,6 +1842,10 @@ void Bowling::key()
 	} else if(glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS && power < 5.0f) {
 		//reduce power
 		power += 0.5;
+	}
+
+	if(glfwGetKey( GLFW_KEY_ESC )) {
+		pause_game();
 	}
 
 	RigidBodyApplication::key();
